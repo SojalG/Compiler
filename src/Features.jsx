@@ -36,7 +36,7 @@ const Features = () => {
     <div id='features' className='py-[150px] flex-col items-center justify-center'>
 
       <h1 className='text-[40px] font-bold mb-3 md:mb-8 text-cyan-500 hover:text-cyan-600 text-center'>FEATURES</h1>
-      <div className='md:flex flex-col gap-20'>
+      <div className='md:flex flex-col gap-20 justify-center items-center '>
          {featuresList.map((feature,index) =>{
             const isOdd = index%2 !== 0;
 

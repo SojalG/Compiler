@@ -36,7 +36,11 @@ const Header = () => {
       </nav>
 
       <div className="md:w-[170px] active-scale-95 ">
-        <button className='hover:text-[#136be0] text-[15px] active:scale-95 ml-[2px] transition-colors transition transform duration-100'>Let’s Compile Your Code</button>
+        <button className='hover:text-[#136be0] text-[15px] active:scale-95 ml-[2px] transition-colors transition transform duration-100 cursor-pointer'>
+          <a href="/compilein/">
+          Let’s Compile Your Code
+          </a>
+          </button>
        
       </div>
 

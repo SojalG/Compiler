@@ -19,7 +19,7 @@ function App3() {
 
         <p className='text-[20px] flex md:text-xl text-gray-400 mt-10 '> Code Smarter, Debug Faster — in the Cloud and Enjoy the new Collaboration Experience of AI</p>
 
-      <a href="" className='text-white inline-flex items-center px-4 py-3 mt-6 rounded-xl hover:bg-[#2879a8] transition-colors bg-[#3194ce]  shadow-md shadow-black hover:shadow-lg hover:shadow-black active:scale-95 '>Start Coding Now -{'>'} </a>
+      <a href="/compilein/" className='text-white inline-flex items-center px-4 py-3 mt-6 rounded-xl hover:bg-[#2879a8] transition-colors bg-[#3194ce]  shadow-md shadow-black hover:shadow-lg hover:shadow-black active:scale-95 '>Start Coding Now -{'>'} </a>
 {/* BUTTONS */}
       {/* <div className='flex justify-right gap-[50px] py-10'>
          <button className='login-button border-solid border-white hover:text-[#10579b] active:text-[#136cc1]'>Login</button>

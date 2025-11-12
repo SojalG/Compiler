@@ -49,12 +49,12 @@ const Login = () => {
         style={{ boxShadow: "0 0 15px 3px #335976ff" }}
       >
         <div className="w-full p-5 bg-gray-900 flex-col flex items-center gap-3 rounded-xl shadow-lg">
-          <img src="/logo.png" alt="logo" className="w-12 md:w-14" />
+          <img src="src/pics/newlogo3.png" alt="logo" className="w-10 md:w-12" />
           <h1 className="text-lg md:text-xl font-semibold">Welcome Back</h1>
           <p className="text-xs md:text-sm text-gray-500 text-center">
             Don't have an account?{" "}
             <Link
-              to="/signup"
+              to="signup"
               className="text-white underline hover:text-blue-400"
             >
               Sign up

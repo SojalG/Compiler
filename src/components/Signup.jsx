@@ -4,6 +4,7 @@ import { MdAlternateEmail } from "react-icons/md";
 import { FaFingerprint, FaGoogle, FaRegEye, FaRegEyeSlash } from "react-icons/fa";
 import { BsApple } from "react-icons/bs";
 import { FaFacebookF } from "react-icons/fa";
+import './../../src/pics/newlogo3.png';
 
 
 const Signup = () => {
@@ -63,11 +64,11 @@ const Signup = () => {
         style={{ boxShadow: "0 0 15px 3px #335976ff" }}
       >
         <div className="w-full p-5 bg-gray-900 flex-col flex items-center gap-3 rounded-xl shadow-lg">
-          <img src="/logo.png" alt="logo" className="w-12 md:w-14" />
+          <img src="src/pics/newlogo3.png" alt="logo" className="w-10 md:w-12" />
           <h1 className="text-lg md:text-xl font-semibold">Create Account</h1>
           <p className="text-xs md:text-sm text-gray-500 text-center">
             Already have an account?{" "}
-            <Link to="/" className="text-white underline hover:text-blue-400">
+            <Link to=".." className="text-white underline hover:text-blue-400">
               Login
             </Link>
           </p>
