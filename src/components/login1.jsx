@@ -10,8 +10,7 @@ import {
 import { BsApple } from "react-icons/bs";
 import { FaFacebookF } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
-import bgimg from "./../../src/pics/newbg.png";
-
+import bgimg from "./../../src/pics/bglogin.png";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -81,19 +80,19 @@ const Signup = () => {
   return (
     <div className="w-full h-screen flex items-center justify-center">
       <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${bgimg})`,
-          opacity: 0.2
-        }}
-      />
+              className="absolute inset-0 bg-cover bg-center"
+              style={{
+                backgroundImage: `url(${bgimg})`,
+                opacity: 0.3
+              }}
+            />
       <div
         className="p-1 rounded-2xl w-[95%] max-w-md relative z-10 bg-[#101828]"
-        style={{ boxShadow: "0 0 15px 8px #335976ff" }}
+        style={{ boxShadow: "0 0 15px 5px #335976ff" }}
       >
-        <div className="w-full p-5 bg-gray-900 flex-col flex items-center gap-3 rounded-xl shadow-lg">
+        <div className="w-full p-6 bg-gray-900 flex-col flex items-center gap-3 rounded-xl shadow-lg">
           <div className="flex">
-            {/* <img src="/logo.png" alt="logo" className="w-6 md:w-6 mr-1.5" /> */}
+            {/* <img src="/newlogo3.png" alt="logo" className="w-6 md:w-6 mr-1.5" /> */}
             <h2 className="text-3xl font-bold">
               <span className="">Compile</span>
               <span className="text-[#64bcff]">IN</span>
@@ -156,7 +155,7 @@ const Signup = () => {
 
           <button
             onClick={handleSignup}
-            className="w-full p-2 bg-green-500 rounded-xl mt-3 hover:bg-green-600 text-sm md:text-base text-white"
+            className="w-full p-2 bg-green-500 rounded-xl mt-3 hover:bg-green-600 text-sm md:text-base cursor-pointer text-white"
           >
             Sign Up
           </button>

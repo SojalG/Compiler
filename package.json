@@ -1,6 +1,6 @@
 {
   "name": "vite-project",
-  "homepage": "https://SojalG.github.io/compilein",
+  "homepage": "https://SojalG.github.io/Compiler",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -26,6 +26,7 @@
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.9.1",
+    "react-toastify": "^11.0.5",
     "styled-components": "^6.1.19",
     "tailwind-merge": "^3.3.1",
     "tailwindcss-animate": "^1.0.7",

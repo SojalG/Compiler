@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import './Compilerstyle.css';
 import profile from './pics/profile.png';
-import settings from './pics/settings.png';
-import delet from './pics/delete.png';
 import copy from './pics/copy.png';
 import terminal from './pics/terminal.png';
 import newlogo3 from './pics/newlogo3.png';
@@ -12,30 +10,25 @@ import refresh from './pics/refresh.png';
 import format from './pics/format.png';
 import light from './pics/light_mode.png';
 import dark from './pics/dark_mode.png';
-import ai from './pics/ai_mode.png';
+import delet from './pics/delete.png';
 import { IoMdSend } from 'react-icons/io';
 import { MdOutlineKeyboardArrowUp } from "react-icons/md";
 import { SiRobotframework } from "react-icons/si";
-import "tailwindcss";
 import { IoCloseOutline } from "react-icons/io5";
+import "tailwindcss";
 
 
 const codeSnippets = {
     'Javascript': `// Javascript
 console.log("Hello, World!");`,
-
     'C++': `// C++
 #include <iostream>
-
 int main() {
     std::cout << "Hello, World!" << std::endl;
     return 0;
 }`,
-
-
     'C': `// C
 #include <stdio.h>
-
 int main() {
     printf("Hello, World!");
     return 0;
@@ -51,21 +44,29 @@ print("Hello, World!")
 `
 };
 
-const DUMMY_FILES = ['file1.js', 'file2.cpp', 'file3.c', 'file4.js', 'file5.py'];
+const judge0LangId = {
+    Javascript: 63,
+    "C++": 54,
+    C: 50,
+    Java: 62,
+    Python: 71
+};
 
+const DUMMY_FILES = ['file1.js', 'file2.cpp', 'file3.c', 'file4.js', 'file5.py'];
 
 const Compiler = () => {
     const [selectedLanguage, setSelectedLanguage] = useState('Javascript');
     const [code, setCode] = useState(codeSnippets['Javascript']);
+    const [output, setOutput] = useState('');
+    const [isRunning, setIsRunning] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [istheme, setIstheme] = useState(false);
     const [isLogout, setIsLogout] = useState(false);
     const [isAIModeOpen, setIsAIModeOpen] = useState(false);
+    const textareaRef = useRef(null);
     const FILE_PANEL_WIDTH = 256;
     const AI_PANEL_WIDTH = 384;
-
 
     const languageMap = {
         JavaScript: 'javascript',
@@ -120,6 +121,74 @@ const Compiler = () => {
 
     const toggleAIMode = () => {
         setIsAIModeOpen(prev => !prev);
+    };
+
+    const handleClearOutput = () => setOutput('');
+
+
+
+
+    const handleRun = async () => {
+        const currentTerminal = output || '';
+
+        setIsRunning(true);
+        setOutput(prev => (prev ? prev + '\n' : '') + 'Compiling...\n');
+
+        try {
+            const payload = {
+                source_code: code,
+                language_id: judge0LangId[selectedLanguage],
+                stdin: currentTerminal
+            };
+
+            const res = await fetch("https://ce.judge0.com/submissions/?base64_encoded=false&wait=true", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                const text = await res.text();
+                setOutput(prev => prev + `\nError: Judge0 responded with status ${res.status}\n${text}\n`);
+                return;
+            }
+
+            const data = await res.json();
+
+            let resultText = '\n=== Execution Result ===\n';
+
+            if (data.compile_output) {
+                resultText += `Compile Error:\n${data.compile_output}\n`;
+            }
+
+            if (data.stderr) {
+                resultText += `Runtime Error:\n${data.stderr}\n`;
+            }
+
+            if (data.stdout) {
+                resultText += `Output:\n${data.stdout}\n`;
+            }
+
+            if (!data.compile_output && !data.stderr && !data.stdout) {
+                if (data.status && data.status.description) {
+                    resultText += `Status: ${data.status.description}\n`;
+                } else {
+                    resultText += 'No output received.\n';
+                }
+            }
+
+            setOutput(prev => prev + resultText + '\n');
+
+            setTimeout(() => {
+                if (textareaRef.current) {
+                    textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
+                }
+            }, 50);
+        } catch (err) {
+            setOutput(prev => prev + `\nNetwork/Error: ${err.message}\n`);
+        } finally {
+            setIsRunning(false);
+        }
     };
 
     const mainContentWidth = isAIModeOpen
@@ -244,8 +313,9 @@ const Compiler = () => {
                                     <option>Java</option>
                                     <option>Python</option>
                                 </select>&nbsp;&nbsp;&nbsp;
-                                <button className="button-6" type="button" title='Run'>Run</button>
-                            </div>
+                                <button className="button-6" type="button" title='Run' onClick={handleRun} disabled={isRunning}>
+                                    {isRunning ? 'Running...' : 'Run'}
+                                </button>                            </div>
                         </div>
                         <div className="code-editor-area flex-grow overflow-hidden">
                             <div className="code-editor h-full w-full">
@@ -278,13 +348,19 @@ const Compiler = () => {
                                 </div>
                             </div>
                             <div className="right-toolbar1-terminal">
-                                {/* <button title='Delete'><img className='delete' src={delet} /></button>&nbsp;&nbsp; */}
+                                <button title='Delete'><img className='delete' src={delet} alt="delete" onClick={handleClearOutput} /></button>&nbsp;&nbsp;
                                 <button title='Terminal Toggle'><MdOutlineKeyboardArrowUp className='delete cursor-pointer' /></button>
                             </div>
                         </div>
                         <div className="code-editor-area-terminal ">
                             <div className="code-editor-terminal">
-                                <textarea className='textarea1' placeholder="Output Here..."></textarea>
+                                <textarea
+                                    ref={textareaRef}
+                                    className='textarea1'
+                                    placeholder="Type input here or view output..."
+                                    value={output}
+                                    onChange={(e) => setOutput(e.target.value)} // allow typing/input and show outputs
+                                />
                             </div>
                         </div>
                     </section>
