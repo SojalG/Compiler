@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdAlternateEmail } from "react-icons/md";
 import {
   FaFingerprint,
@@ -11,7 +11,6 @@ import {
 import { BsApple } from "react-icons/bs";
 import { ToastContainer, toast } from "react-toastify";
 import bgimg from "./../../src/pics/newbg.png";
-
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -45,7 +44,9 @@ const Login = () => {
       theme: "colored",
     });
 
-  const handleLogin = (e) => {
+  const navigate = useNavigate();
+
+  const handleLogin = async (e) => {
     e.preventDefault();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -56,7 +57,25 @@ const Login = () => {
       errorNotify("Please enter a valid password.");
       return;
     }
-    successNotify("Login successful!");
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        successNotify("Login successful!");
+        navigate("/compiler");
+      } else {
+        errorNotify(`${data.message}`);
+      }
+    } catch (err) {
+      console.error(err);
+      errorNotify("Server error. Please try again later.");
+    }
   };
 
   return (
@@ -65,7 +84,7 @@ const Login = () => {
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage: `url(${bgimg})`,
-          opacity: 0.2
+          opacity: 0.2,
         }}
       />
       <div
@@ -127,9 +146,8 @@ const Login = () => {
             </div>
             {error && <p className="text-red-500 text-xs">{error}</p>}
           </div>
-          
+
           <button
-            
             onClick={handleLogin}
             className="w-full p-2 bg-blue-500 rounded-xl mt-3 hover:bg-blue-600 text-sm md:text-base cursor-pointer text-white"
           >

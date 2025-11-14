@@ -18,7 +18,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import "tailwindcss";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Prism } from "react-syntax-highlighter";
-import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { duotoneDark, duotoneEarth, duotoneForest, duotoneLight, duotoneSea, oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { FaCopy } from "react-icons/fa";
 import { PiBracketsCurlyBold } from "react-icons/pi";
 import { AnimatePresence } from "framer-motion";
@@ -58,7 +58,8 @@ const judge0LangId = {
     Python: 71
 };
 
-const DUMMY_FILES = ['file1.js', 'file2.cpp', 'file3.c', 'file4.js', 'file5.py'];
+// const DUMMY_FILES = ['file1.js', 'file2.cpp', 'file3.c', 'file4.js', 'file5.py'];
+
 
 const Compiler = () => {
     const [selectedLanguage, setSelectedLanguage] = useState('Javascript');
@@ -81,6 +82,15 @@ const Compiler = () => {
         Java: 'java',
         Python: 'python',
     };
+
+    const [DUMMY_FILES, setDUMMY_FILES] = useState([
+        "file1.js",
+        "file2.cpp",
+        "file3.c",
+        "file4.js",
+        "file5.py",
+    ]);
+
 
 
     const handleLanguageChange = (event) => {
@@ -138,7 +148,7 @@ const Compiler = () => {
         const currentTerminal = output || '';
 
         setIsRunning(true);
-        setOutput(prev => (prev ? prev + '\n' : '') + 'Compiling...\n');
+        setOutput(prev => (prev ? prev + '\n' : '') + 'Compiling...\n\n\n');
 
         try {
             const payload = {
@@ -275,7 +285,7 @@ const Compiler = () => {
                 const newAiMsg = {
                     role: "ai",
                     element: (
-                        <Prism language={selectedLanguage} style={oneDark}>
+                        <Prism language={selectedLanguage} style={duotoneSea}>
                             {code}
                         </Prism>
                     ),
@@ -324,7 +334,9 @@ const Compiler = () => {
                 <div className="left-header">
                     <span className="left">
                         <img className='imglogo-style' src={newlogo3} />&nbsp;
-                        <img className='img-logo' src={finale} />
+                        <a href="/compilein/" className='active:scale-95'>
+                            <img className='img-logo' src={finale} />
+                        </a>
                     </span>
                 </div>
                 <div className="right-header">
@@ -347,7 +359,7 @@ const Compiler = () => {
                         </button>
                         {isProfileMenuOpen && (
                             <div className="profile-dropdown-menu">
-                                <a href="/compilein/homepage">
+                                <a href="/compilein/">
                                     <button className="dropdown-item" >Home</button>
                                 </a>
 
@@ -583,7 +595,7 @@ const Compiler = () => {
                                     ) : (
                                         <div className="self-start bg-slate-800 text-white px-4 py-2 rounded-2xl max-w-[80%]  shadow text-sm ml-2">
                                             <span className="font-bold flex justify-between text-slate-200">
-                                                {" "}
+                                                AI : &nbsp;{" "}
                                                 <div className="flex gap-3">
                                                     <div className="relative group">
                                                         <button
@@ -611,7 +623,7 @@ const Compiler = () => {
                                                                 setTimeout(() => setCopied(false), 800);
                                                             }}
                                                         >
-                                                            <FaCopy className='h-3.5 w-3.5'/>
+                                                            <FaCopy className='h-3.5 w-3.5' />
                                                             <span
                                                                 className={`absolute -top-8 left-1/2 -translate-x-1/2 text-xs rounded-md px-2 py-1 bg-slate-800 text-white transition-opacity duration-200 pointer-events-none ${copied
                                                                     ? "opacity-100"
@@ -631,7 +643,7 @@ const Compiler = () => {
                             ))}
 
                             {loading && (
-                                <p className="text-gray-300 text-sm mt-3 italic">
+                                <p className="text-gray-300 text-sm mt-3 italic ml-2">
                                     Thinking<span className="animate-pulse">...</span>
                                 </p>
                             )}

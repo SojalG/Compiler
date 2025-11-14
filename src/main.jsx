@@ -15,7 +15,7 @@ import Signup from './components/Signup.jsx';
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <App3 />,
   },
   {
     path: "/loginpage",
@@ -32,8 +32,8 @@ const router = createBrowserRouter([
     ]
   },
   {
-    path: "/homepage",
-    element: <App3 />,
+    path: "/compiler",
+    element: <App />,
   }
 ],
   {

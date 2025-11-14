@@ -29,7 +29,7 @@ export default {
             transform: 'translate(-10px, 10px) scale(1.1)',
           },
         },
-        'float': {
+        float: {
           '0%, 100%': { transform: 'translateY(20px)' },
           '50%': { transform: 'translateY(-20px)' }, 
         },
@@ -39,7 +39,7 @@ export default {
         },
       },
       animation: {
-        'float': 'float 4.25s ease-in-out infinite',
+        float: 'float 4.25s ease-in-out infinite',
 
         'fade-in': 'fade-in 1s ease-out forwards',
 

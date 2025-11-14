@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { MdAlternateEmail } from "react-icons/md";
 import {
   FaFingerprint,
@@ -12,7 +12,6 @@ import { FaFacebookF } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import bgimg from "./../../src/pics/newbg.png";
 
-
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,12 +22,14 @@ const Signup = () => {
   const togglePasswordView = () => setShowPassword(!showPassword);
 
   const validatePasswords = (pass, confirm) => {
-    const regex =
-      /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
-    if (!regex.test(pass)) {
-      setError(
-        "Password must be at least 8 characters, include uppercase, lowercase, number, and special character."
-      );
+    // const regex =
+    //   /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
+    // if (!regex.test(pass)) {
+    //   setError(
+    //     "Password must be at least 8 characters, include uppercase, lowercase, number, and special character."
+    //   );
+    if (pass.length < 8 || confirm.length < 8) {
+      setError("password length > 8");
     } else if (pass !== confirm) {
       setError("Passwords do not match.");
     } else {
@@ -62,7 +63,10 @@ const Signup = () => {
       theme: "colored",
     });
 
-  const handleSignup = (e) => {
+  const navigate = useNavigate();
+
+
+  const handleSignup = async (e) => {
     e.preventDefault();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -75,6 +79,31 @@ const Signup = () => {
       errorNotify("Please fix the errors before signing up.");
       return;
     }
+
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, confirmPassword }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // alert(data.message || "Signup successful!");
+        setEmail("");
+        setPassword("");
+        setConfirmPassword("");
+        setError("");
+        navigate("/loginpage");
+      } else {
+        errorNotify(data.message || "Signup failed. Try again.");
+      }
+    } catch (err) {
+      console.error("Signup error:", err);
+      errorNotify("Server error. Please try again later.");
+    }
+
     successNotify("Signup successful!");
   };
 
@@ -84,7 +113,7 @@ const Signup = () => {
         className="absolute inset-0 bg-cover bg-center"
         style={{
           backgroundImage: `url(${bgimg})`,
-          opacity: 0.2
+          opacity: 0.2,
         }}
       />
       <div
@@ -102,7 +131,10 @@ const Signup = () => {
           <h1 className="text-lg md:text-xl font-semibold">Create Account</h1>
           <p className="text-xs md:text-sm text-gray-500 text-center">
             Already have an account?{" "}
-            <Link to="/loginpage" className="text-white underline hover:text-blue-400">
+            <Link
+              to="/loginpage"
+              className="text-white underline hover:text-blue-400"
+            >
               Login
             </Link>
           </p>

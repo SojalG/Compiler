@@ -33,7 +33,7 @@ const Header = () => {
         <a href="#how_works" className='hover:text-[#136be0] active:scale-90 transition-colors'>How It Works</a>
       </nav>
 
-        <a href="/compilein/" className='text-white inline-flex items-center px-4 py-3 cursor-pointer rounded-xl hover:bg-[#395eb2]/40 transition-colors bg-[#5773b2]/60  shadow-md shadow-black hover:shadow-lg hover:shadow-black active:scale-95'>Let’s Compile Your Code</a>
+        <a href="/compilein/compiler/" className='text-white inline-flex items-center px-4 py-3 cursor-pointer rounded-xl hover:bg-[#395eb2]/40 transition-colors bg-[#5773b2]/60  shadow-md shadow-black hover:shadow-lg hover:shadow-black active:scale-95'>Let’s Compile Your Code</a>
     </header>
   )
 }
