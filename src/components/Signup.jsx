@@ -12,6 +12,9 @@ import { FaFacebookF } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import bgimg from "./../../src/pics/newbg.png";
 import logo from "./../../src/pics/newlogo3.png";
+import newlogo from './../../src/assets/newlogo.png';
+import cmpltlogo from './../../src/assets/cmplt-logo.png';
+import LiquidEther from './LiquidEther';
 
 
 const Signup = () => {
@@ -110,26 +113,35 @@ const Signup = () => {
   };
 
   return (
-    <div className="w-full h-screen flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage: `url(${bgimg})`,
-          opacity: 0.2,
-        }}
-      />
+    <div className="w-full h-screen flex items-center justify-center bg-[#000613]">
+     <div className="w-full h-full absolute">
+             <LiquidEther
+               colors={['#5227FF', '#16abe1', '#a3aacc']}
+               mouseForce={20}
+               cursorSize={100}
+               isViscous={false}
+               viscous={30}
+               iterationsViscous={32}
+               iterationsPoisson={32}
+               resolution={0.5}
+               isBounce={false}
+               autoDemo={true}
+               autoSpeed={0.5}
+               autoIntensity={2.2}
+               takeoverDuration={0.25}
+               autoResumeDelay={3000}
+               autoRampDuration={0.6}
+             />
+           </div>
       <div
         className="p-1 rounded-2xl w-[95%] max-w-md relative z-10 bg-[#101828]"
-        style={{ boxShadow: "0 0 15px 8px #335976ff" }}
+        style={{ boxShadow: "0 0 15px 3px #335976ff" }}
       >
         <div className="w-full p-5 bg-gray-900 flex-col flex items-center gap-3 rounded-xl shadow-lg">
-          <div className="flex">
-            <img src={logo} alt="logo" className="w-6 md:w-6 mr-1.5" />
-            <h2 className="text-3xl font-bold">
-              <span className="">Compile</span>
-              <span className="text-[#64bcff]">IN</span>
-            </h2>
-          </div>
+          <a href="/compilein/" className='flex justify-center active:scale-95 items-center'>
+            <img className='logo w-[22px] md:w-[38px]' src={newlogo} alt="logo" />
+            <img className='logo w-[120px] md:w-[150px] mt-1' src={cmpltlogo} alt="logo" />
+          </a>
           <h1 className="text-lg md:text-xl font-semibold">Create Account</h1>
           <p className="text-xs md:text-sm text-gray-500 text-center">
             Already have an account?{" "}

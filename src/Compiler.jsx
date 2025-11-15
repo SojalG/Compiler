@@ -147,9 +147,10 @@ const Compiler = () => {
 
     const handleRun = async () => {
         const currentTerminal = output || '';
+        handleClearOutput();
 
         setIsRunning(true);
-        setOutput(prev => (prev ? prev + '\n' : '') + 'Compiling...\n\n\n');
+        setOutput(prev => (prev ? prev + '\n' : ''));
 
         try {
             const payload = {
