@@ -73,9 +73,9 @@ const Compiler = () => {
     const [isLogout, setIsLogout] = useState(false);
     const [isAIModeOpen, setIsAIModeOpen] = useState(false);
     const textareaRef = useRef(null);
-    const FILE_PANEL_WIDTH = 256;
-    const AI_PANEL_WIDTH = 384;
-
+    // const FILE_PANEL_WIDTH = 256;
+    // const AI_PANEL_WIDTH = 384;
+    const AI_PANEL_DYNAMIC_WIDTH = '23%';
     const languageMap = {
         JavaScript: 'javascript',
         'C++': 'cpp',
@@ -208,9 +208,9 @@ const Compiler = () => {
         }
     };
 
-    const mainContentWidth = isAIModeOpen
-        ? `calc(100% - ${FILE_PANEL_WIDTH}px - ${AI_PANEL_WIDTH}px)`
-        : `calc(100% - ${FILE_PANEL_WIDTH}px)`;
+    // const mainContentWidth = isAIModeOpen
+    //     ? `calc(100% - ${FILE_PANEL_WIDTH}px - ${AI_PANEL_WIDTH}px)`
+    //     : `calc(100% - ${FILE_PANEL_WIDTH}px)`;
 
     const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
@@ -237,7 +237,6 @@ const Compiler = () => {
         }
 
         const newUserMsg = { role: "user", text: question.toString() };
-        // setMessages((prev) => [...prev, newUserMsg]);
         const msgs = [...messages, newUserMsg];
         setMessages(msgs);
         setQuestion("");
@@ -328,7 +327,6 @@ const Compiler = () => {
         }
     };
 
-
     return (
         <div className="app-container">
             <header className="header1">
@@ -353,7 +351,6 @@ const Compiler = () => {
                     >
                         <SiRobotframework title='AI Mode' className='ai mt-5 cursor-pointer' />
                     </button>
-                    {/* <button className='button2' title='Settings'><img className='setting' src={settings} /></button>&nbsp;&nbsp; */}
                     <div className="profile-menu-container">
                         <button className='button2 mt-3' onClick={toggleProfileMenu} title="Profile">
                             <img className='img1' src={profile} />
@@ -428,8 +425,8 @@ const Compiler = () => {
                                 <div className="leftheading">
                                     <b>Login to view your Files</b><br /><br />
                                 </div>
-                                <a href="/compilein/loginpage">
-                                    <button className="button-2 md:flex md:ml-[60px]" type="button" title='Simulate Login' onClick={handleLoginToggle}>
+                                <a href="/compilein/loginpage" className='flex items-center justify-center w-full'>
+                                    <button className="button-2" type="button" title='Simulate Login' onClick={handleLoginToggle}>
                                         Login
                                     </button>
                                 </a>
@@ -442,9 +439,12 @@ const Compiler = () => {
                     <div className="container"></div>
                 </section>
 
-                <section
+                {/* <section
                     className="editor-section flex-grow flex flex-col bg-[#1e1e1e] transition-all duration-300 min-w-0"
                     style={{ width: mainContentWidth }}
+                > */}
+                <section
+                    className="editor-section flex-grow flex flex-col bg-[#1e1e1e] transition-all duration-300 min-w-0"
                 >
                     <section className="main-content flex-grow flex flex-col h-full">
                         <div className="toolbar flex justify-between items-center bg-[#282c34] p-2 flex-shrink-0 border-b border-gray-700">
@@ -473,7 +473,6 @@ const Compiler = () => {
                                 <Editor
                                     height="100%"
                                     width="100%"
-                                    // language={selectedLanguage.toLowerCase()}
                                     language={languageMap[selectedLanguage]}
                                     defaultLanguage='javascript'
                                     theme="vs-dark"
@@ -510,7 +509,7 @@ const Compiler = () => {
                                     className='textarea1'
                                     placeholder="Type input here or view output..."
                                     value={output}
-                                    onChange={(e) => setOutput(e.target.value)} // allow typing/input and show outputs
+                                    onChange={(e) => setOutput(e.target.value)}
                                 />
                             </div>
                         </div>
@@ -559,17 +558,26 @@ const Compiler = () => {
                     </div>
                 </section> */}
 
-                <section
+                {/* <section
                     className="main-content-ai flex-shrink-0 flex flex-col bg-[#21252b] shadow-2xl z-50 transition-all duration-300 border-l border-gray-700 ml-2"
                     style={{
                         width: isAIModeOpen ? `${AI_PANEL_WIDTH}px` : '0px',
                         visibility: isAIModeOpen ? 'visible' : 'hidden',
                         minWidth: isAIModeOpen ? `${AI_PANEL_WIDTH}px` : '0px',
                     }}
+                > */}
+                <section
+                    className="main-content-ai flex-shrink-0 flex flex-col bg-[#21252b] shadow-2xl z-50 transition-all duration-300 border-l border-gray-700 ml-2"
+                    style={{
+                        width: isAIModeOpen ? AI_PANEL_DYNAMIC_WIDTH : '0px',
+                        visibility: isAIModeOpen ? 'visible' : 'hidden',
+                        minWidth: isAIModeOpen ? AI_PANEL_DYNAMIC_WIDTH : '0px',
+                        maxWidth: isAIModeOpen ? '350px' : '0px',
+                    }}
                 >
                     <div className="toolbar-ai">
-                        <div className="left-toolbar-ai">
-                            <div className="file-explorer-path-ai flex items-center justify-between">
+                        <div className="left-toolbar-ai flex items-center justify-between w-full">
+                            <div className="file-explorer-path-ai">
                                 <SiRobotframework className='delete mt-0.5 align-right' />
                                 &nbsp;&nbsp;
                                 <span className="path-item-ai text-lg font-bold">AI-Mode</span>
@@ -577,7 +585,7 @@ const Compiler = () => {
                             <button
                                 title='Close AI Mode'
                                 onClick={toggleAIMode}
-                                className="p-1 rounded hover:bg-gray-700 transition-colors cursor-pointer lg:ml-55.5">
+                                className="p-1 rounded hover:bg-gray-700 transition-colors cursor-pointer">
                                 <IoCloseOutline />
                             </button>
                         </div>
