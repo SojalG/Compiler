@@ -11,6 +11,8 @@ import {
 import { BsApple } from "react-icons/bs";
 import { ToastContainer, toast } from "react-toastify";
 import bgimg from "./../../src/pics/newbg.png";
+import logo from "./../../src/pics/newlogo3.png";
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -93,7 +95,7 @@ const Login = () => {
       >
         <div className="w-full p-6 bg-gray-900 flex-col flex items-center gap-3 rounded-xl shadow-lg">
           <div className="flex">
-            {/* <img src="" alt="logo" className="w-6 md:w-6 mr-1.5" /> */}
+            <img src={logo} alt="logo" className="w-6 md:w-6 mr-1.5" />
 
             <h2 className="text-3xl font-bold">
               <span className="">Compile</span>

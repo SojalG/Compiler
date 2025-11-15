@@ -11,6 +11,8 @@ import { BsApple } from "react-icons/bs";
 import { FaFacebookF } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import bgimg from "./../../src/pics/newbg.png";
+import logo from "./../../src/pics/newlogo3.png";
+
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -122,7 +124,7 @@ const Signup = () => {
       >
         <div className="w-full p-5 bg-gray-900 flex-col flex items-center gap-3 rounded-xl shadow-lg">
           <div className="flex">
-            {/* <img src="/logo.png" alt="logo" className="w-6 md:w-6 mr-1.5" /> */}
+            <img src={logo} alt="logo" className="w-6 md:w-6 mr-1.5" />
             <h2 className="text-3xl font-bold">
               <span className="">Compile</span>
               <span className="text-[#64bcff]">IN</span>
