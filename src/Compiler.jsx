@@ -23,6 +23,7 @@ import { duotoneDark, duotoneEarth, duotoneForest, duotoneLight, duotoneSea, one
 import { FaCopy } from "react-icons/fa";
 import { PiBracketsCurlyBold } from "react-icons/pi";
 import { AnimatePresence } from "framer-motion";
+import { useNavigate } from 'react-router-dom';
 
 
 const codeSnippets = {
@@ -124,8 +125,11 @@ const Compiler = () => {
         monaco.editor.setTheme('my-custom-theme');
     };
 
+    const navigate = useNavigate();
+
     const handleLoginToggle = () => {
-        setIsLoggedIn(prev => !prev);
+        navigate("/loginpage");
+        // setIsLoggedIn((prev) => !prev);
     };
 
     const theme = () => {
@@ -328,6 +332,17 @@ const Compiler = () => {
         }
     };
 
+    // useEffect(() => {
+    //     const loggedIn = localStorage.getItem("loginCheck");
+    //     if (!loggedIn) {
+    //         setIsLoggedIn(false);
+    //         navigate("/login");
+    //     } else {
+    //         setIsLoggedIn(true);
+    //     }
+    // }, []);
+
+
     return (
         <div className="app-container">
             <header className="header1">
@@ -364,13 +379,26 @@ const Compiler = () => {
 
                                 {/* <button className="dropdown-item" >Profile</button> */}
                                 {/* <button className="dropdown-item" >Account Settings</button> */}
-                                {isLogout ? (
-                                    <button className="dropdown-item logout-link" type="button" title='Simulate Login' onClick={handleLoginToggle}>Login</button>
+                                {localStorage.getItem("loginCheck") === "false" ? (
+                                    <button
+                                        className="dropdown-item login-link"
+                                        type="button"
+                                        title="Simulate Login"
+                                        onClick={handleLoginToggle}
+                                    >
+                                        Login
+                                    </button>
                                 ) : (
-                                    <button className="dropdown-item logout-link" type="button" title='Simulate Login' onClick={handleLoginToggle}>
-                                        {isLoggedIn ? 'Logout' : 'Login'}
+                                    <button
+                                        className="dropdown-item logout-link"
+                                        type="button"
+                                        title="Simulate Login"
+                                        onClick={handleLoginToggle}
+                                    >
+                                        Logout
                                     </button>
                                 )}
+
                             </div>
                         )}
                     </div>
@@ -385,10 +413,17 @@ const Compiler = () => {
                         <b>FILES</b>
                     </div>
                     <hr style={{ width: '105%', marginBottom: '10px' }} />
-                    <div style={{ width: '100%', padding: '0 5px' }}>
-                        {isLoggedIn ? (
-                            <div style={{ marginTop: '15px' }}>
-                                <div style={{ color: '#ffffff', marginBottom: '15px', fontSize: '0.9em', fontWeight: 'bold' }}>
+                    <div style={{ width: "100%", padding: "0 5px" }}>
+                        {localStorage.getItem("loginCheck") === "true" ? (
+                            <div style={{ marginTop: "15px" }}>
+                                <div
+                                    style={{
+                                        color: "#ffffff",
+                                        marginBottom: "15px",
+                                        fontSize: "0.9em",
+                                        fontWeight: "bold",
+                                    }}
+                                >
                                     YOUR PROJECTS
                                 </div>
                                 {DUMMY_FILES.map((file, index) => (
@@ -423,14 +458,18 @@ const Compiler = () => {
                             </div>
                         ) : (
                             <>
-                                <div className="leftheading">
-                                    <b>Login to view your Files</b><br /><br />
+                                <div className="leftheading flex flex flex-col items-center justify-center text-center">
+                                    <b>Login to view your Files</b>
                                 </div>
-                                <a href="/compilein/loginpage" className='flex items-center justify-center w-full'>
-                                    <button className="button-2" type="button" title='Simulate Login' onClick={handleLoginToggle}>
-                                        Login
-                                    </button>
-                                </a>
+                                <br />
+                                <button
+                                    className="button-2 flex items-center justify-center mx-auto"
+                                    type="button"
+                                    title="Simulate Login"
+                                    onClick={handleLoginToggle}
+                                >
+                                    Login
+                                </button>
                             </>
                         )}
                     </div>

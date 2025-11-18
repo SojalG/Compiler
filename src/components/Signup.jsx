@@ -34,7 +34,7 @@ const Signup = () => {
     //     "Password must be at least 8 characters, include uppercase, lowercase, number, and special character."
     //   );
     if (pass.length < 8 || confirm.length < 8) {
-      setError("password length > 8");
+      setError("Password must be at least 8 characters");
     } else if (pass !== confirm) {
       setError("Passwords do not match.");
     } else {
@@ -72,7 +72,7 @@ const Signup = () => {
 
 
   const handleSignup = async (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       // alert("Please enter a valid email address.");
@@ -138,9 +138,20 @@ const Signup = () => {
         style={{ boxShadow: "0 0 15px 3px #335976ff" }}
       >
         <div className="w-full p-5 bg-gray-900 flex-col flex items-center gap-3 rounded-xl shadow-lg">
-          <a href="/compilein/" className='flex justify-center active:scale-95 items-center'>
-            <img className='logo w-[22px] md:w-[38px]' src={newlogo} alt="logo" />
-            <img className='logo w-[120px] md:w-[150px] mt-1' src={cmpltlogo} alt="logo" />
+          <a
+            href="/compilein/"
+            className="flex justify-center active:scale-95 items-center"
+          >
+            <img
+              className="logo w-[22px] md:w-[38px]"
+              src={newlogo}
+              alt="logo"
+            />
+            <img
+              className="logo w-[120px] md:w-[150px] mt-1"
+              src={cmpltlogo}
+              alt="logo"
+            />
           </a>
           <h1 className="text-lg md:text-xl font-semibold">Create Account</h1>
           <p className="text-xs md:text-sm text-gray-500 text-center">
@@ -161,6 +172,7 @@ const Signup = () => {
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSignup()}
                 className="bg-transparent border-0 w-full outline-none text-sm md:text-base"
               />
             </div>
@@ -172,6 +184,7 @@ const Signup = () => {
                 placeholder="Password"
                 value={password}
                 onChange={handlePasswordChange}
+                onKeyDown={(e) => e.key === "Enter" && handleSignup()}
                 className="bg-transparent border-0 w-full outline-none text-sm md:text-base"
               />
               {showPassword ? (
@@ -194,6 +207,7 @@ const Signup = () => {
                 placeholder="Confirm Password"
                 value={confirmPassword}
                 onChange={handleConfirmPasswordChange}
+                onKeyDown={(e) => e.key === "Enter" && handleSignup()}
                 className="bg-transparent border-0 w-full outline-none text-sm md:text-base"
               />
             </div>
@@ -227,7 +241,7 @@ const Signup = () => {
               <FaFacebookF className="text-lg md:text-xl" />
             </div>
           </div>
-        </div>
+        </div>
       </div>
       <ToastContainer />
     </div>

@@ -527,16 +527,16 @@ button img:hover {
     color: #ffffff;
 }
 
-.logout-link {
+.login-link {
     border-top: 1px solid #3e4451;
     margin-top: 5px;
     padding-top: 10px;
     font-weight: bold;
-    color: #ef5350;
+    color: #0eeb32;
 }
 
-.logout-link:hover {
-    color: #ff8a80;
+.login-link:hover {
+    color: #0eeb32;
 }
 
 .img-logo {

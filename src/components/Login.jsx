@@ -51,7 +51,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
-    e.preventDefault();
+    // e.preventDefault();
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       errorNotify("Please enter a valid email address.");
@@ -71,6 +71,7 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
+        localStorage.setItem("loginCheck", "true");
         successNotify("Login successful!");
         navigate("/compiler");
       } else {
@@ -131,6 +132,7 @@ const Login = () => {
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                 className="bg-transparent border-0 w-full outline-none text-sm md:text-base"
               />
             </div>
@@ -142,6 +144,7 @@ const Login = () => {
                 placeholder="Password"
                 value={password}
                 onChange={handlePasswordChange}
+                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                 className="bg-transparent border-0 w-full outline-none text-sm md:text-base"
               />
               {showPassword ? (
@@ -157,7 +160,7 @@ const Login = () => {
               )}
             </div>
             {error && <p className="text-red-500 text-xs">{error}</p>}
-          </div>
+          </div>
 
           <button
             onClick={handleLogin}
