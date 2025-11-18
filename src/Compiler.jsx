@@ -128,8 +128,9 @@ const Compiler = () => {
     const navigate = useNavigate();
 
     const handleLoginToggle = () => {
+        localStorage.setItem("loginCheck", "false");
+        setIsLoggedIn(false);
         navigate("/loginpage");
-        // setIsLoggedIn((prev) => !prev);
     };
 
     const theme = () => {

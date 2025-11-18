@@ -539,6 +539,18 @@ button img:hover {
     color: #0eeb32;
 }
 
+.logout-link {
+    border-top: 1px solid #3e4451;
+    margin-top: 5px;
+    padding-top: 10px;
+    font-weight: bold;
+    color: #da1a1a;
+}
+
+.logout-link:hover {
+    color: #da1a1a;
+}
+
 .img-logo {
     margin-top: 12px;
     margin-left: -10px;
