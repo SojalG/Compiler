@@ -24,6 +24,7 @@ import { FaCopy } from "react-icons/fa";
 import { PiBracketsCurlyBold } from "react-icons/pi";
 import { AnimatePresence } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
+import { toast, ToastContainer } from "react-toastify";
 
 
 const codeSnippets = {
@@ -343,6 +344,13 @@ const Compiler = () => {
     //     }
     // }, []);
 
+    const loginError = () =>
+        toast.error("Please login to continue with AI", {
+            position: "top-right",
+            autoClose: 2000,
+            theme: "colored",
+        });
+
 
     return (
         <div className="app-container">
@@ -610,10 +618,13 @@ const Compiler = () => {
                 <section
                     className="main-content-ai flex-shrink-0 flex flex-col bg-[#21252b] shadow-2xl z-50 transition-all duration-300 border-l border-gray-700 ml-2"
                     style={{
-                        width: isAIModeOpen ? AI_PANEL_DYNAMIC_WIDTH : '0px',
-                        visibility: isAIModeOpen ? 'visible' : 'hidden',
-                        minWidth: isAIModeOpen ? AI_PANEL_DYNAMIC_WIDTH : '0px',
-                        maxWidth: isAIModeOpen ? '350px' : '0px',
+                        width: isAIModeOpen ? AI_PANEL_DYNAMIC_WIDTH : "0px",
+                        visibility: isAIModeOpen ? "visible" : "hidden",
+                        minWidth: isAIModeOpen ? AI_PANEL_DYNAMIC_WIDTH : "0px",
+                        maxWidth: isAIModeOpen ? "350px" : "0px",
+                    }}
+                    onClick={() => {
+                        if (localStorage.getItem("loginCheck") === "false") loginError();
                     }}
                 >
                     <div className="toolbar-ai">
@@ -707,6 +718,7 @@ const Compiler = () => {
                                 value={question}
                                 onChange={(e) => setQuestion(e.target.value)}
                                 onKeyDown={(e) => e.key === "Enter" && askAi()}
+                                disabled={localStorage.getItem("loginCheck") === "false"}
                             />
                             <button
                                 title="Send"
@@ -719,6 +731,7 @@ const Compiler = () => {
                     </div>
                 </section>
             </main>
+            <ToastContainer />
         </div>
     );
 };
