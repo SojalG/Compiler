@@ -1,4 +1,3 @@
-import React from 'react';
 import Compiler from './Compiler.jsx';
 
 function App() {

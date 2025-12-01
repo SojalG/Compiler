@@ -10,8 +10,6 @@ import {
 import { BsApple } from "react-icons/bs";
 import { FaFacebookF } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
-import bgimg from "./../../src/pics/newbg.png";
-import logo from "./../../src/pics/newlogo3.png";
 import newlogo from './../../src/assets/newlogo.png';
 import cmpltlogo from './../../src/assets/cmplt-logo.png';
 import LiquidEther from './LiquidEther';
@@ -27,12 +25,6 @@ const Signup = () => {
   const togglePasswordView = () => setShowPassword(!showPassword);
 
   const validatePasswords = (pass, confirm) => {
-    // const regex =
-    //   /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%?&])[A-Za-z\d@$!%?&]{8,}$/;
-    // if (!regex.test(pass)) {
-    //   setError(
-    //     "Password must be at least 8 characters, include uppercase, lowercase, number, and special character."
-    //   );
     if (pass.length < 8 || confirm.length < 8) {
       setError("Password must be at least 8 characters");
     } else if (pass !== confirm) {

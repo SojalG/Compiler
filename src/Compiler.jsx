@@ -15,17 +15,13 @@ import { IoMdSend } from 'react-icons/io';
 import { MdOutlineKeyboardArrowUp, MdEdit, MdDeleteOutline } from "react-icons/md";
 import { SiRobotframework } from "react-icons/si";
 import { IoCloseOutline } from "react-icons/io5";
-// import "tailwindcss";
-import './compilerstyle.css';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Prism } from "react-syntax-highlighter";
-import { duotoneDark, duotoneEarth, duotoneForest, duotoneLight, duotoneSea, oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { duotoneSea } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { FaCopy } from "react-icons/fa";
 import { PiBracketsCurlyBold } from "react-icons/pi";
-import { AnimatePresence } from "framer-motion";
 import { useNavigate } from 'react-router-dom';
 import { toast, ToastContainer } from "react-toastify";
-
 
 const codeSnippets = {
     'Javascript': `// Javascript
@@ -61,9 +57,6 @@ const judge0LangId = {
     Python: 71
 };
 
-// const DUMMY_FILES = ['file1.js', 'file2.cpp', 'file3.c', 'file4.js', 'file5.py'];
-
-
 const Compiler = () => {
     const [selectedLanguage, setSelectedLanguage] = useState('Javascript');
     const [code, setCode] = useState(codeSnippets['Javascript']);
@@ -75,9 +68,12 @@ const Compiler = () => {
     const [isLogout, setIsLogout] = useState(false);
     const [isAIModeOpen, setIsAIModeOpen] = useState(false);
     const textareaRef = useRef(null);
-    // const FILE_PANEL_WIDTH = 256;
-    // const AI_PANEL_WIDTH = 384;
     const AI_PANEL_DYNAMIC_WIDTH = '23%';
+
+    const [editorHeight, setEditorHeight] = useState(70);
+    const editorSection = useRef(null);
+    const isDragging = useRef(false);
+
     const languageMap = {
         JavaScript: 'javascript',
         'C++': 'cpp',
@@ -94,24 +90,19 @@ const Compiler = () => {
         "file5.py",
     ]);
 
-
-
     const handleLanguageChange = (event) => {
         const newLanguage = event.target.value;
         setSelectedLanguage(newLanguage);
         setCode(codeSnippets[newLanguage]);
     };
 
-
     const handleEditorChange = (value) => {
         setCode(value);
     }
 
-
     const toggleProfileMenu = () => {
         setIsProfileMenuOpen(prev => !prev);
     };
-
 
     const handleEditorDidMount = (editor, monaco) => {
         monaco.editor.defineTheme('my-custom-theme', {
@@ -138,18 +129,11 @@ const Compiler = () => {
         setIstheme(prev => !prev);
     };
 
-    const logout = () => {
-        setIsLogout(prev => !prev);
-    };
-
     const toggleAIMode = () => {
         setIsAIModeOpen(prev => !prev);
     };
 
     const handleClearOutput = () => setOutput('');
-
-
-
 
     const handleRun = async () => {
         const currentTerminal = output || '';
@@ -200,9 +184,7 @@ const Compiler = () => {
                     resultText += 'No output received.\n';
                 }
             }
-
             setOutput(prev => prev + resultText + '\n');
-
             setTimeout(() => {
                 if (textareaRef.current) {
                     textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
@@ -215,10 +197,6 @@ const Compiler = () => {
         }
     };
 
-    // const mainContentWidth = isAIModeOpen
-    //     ? `calc(100% - ${FILE_PANEL_WIDTH}px - ${AI_PANEL_WIDTH}px)`
-    //     : `calc(100% - ${FILE_PANEL_WIDTH}px)`;
-
     const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
     const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
@@ -227,15 +205,6 @@ const Compiler = () => {
     const [messages, setMessages] = useState([]);
     const [codeToCopy, setCodeToCopy] = useState("");
     const [copied, setCopied] = useState(false);
-
-    //   const formatCode = (resp) => {
-    //     const code = resp.replace(/^```[a-zA-Z]*\n?/, "").replace(/```$/, "");
-    //     return (
-    //       <Prism language={selectedLanguage} style={oneDark}>
-    //         {code}
-    //       </Prism>
-    //     );
-    //   };
 
     const askAi = async () => {
         console.log(question);
@@ -247,7 +216,6 @@ const Compiler = () => {
         const msgs = [...messages, newUserMsg];
         setMessages(msgs);
         setQuestion("");
-
         setLoading(true);
 
         try {
@@ -327,22 +295,13 @@ const Compiler = () => {
             setDUMMY_FILES(updatedFiles);
         }
     };
+
     const deleteFile = (index) => {
         if (window.confirm(`Delete ${DUMMY_FILES[index]}?`)) {
             const files = DUMMY_FILES.filter((_, i) => i !== index);
             setDUMMY_FILES(files);
         }
     };
-
-    // useEffect(() => {
-    //     const loggedIn = localStorage.getItem("loginCheck");
-    //     if (!loggedIn) {
-    //         setIsLoggedIn(false);
-    //         navigate("/login");
-    //     } else {
-    //         setIsLoggedIn(true);
-    //     }
-    // }, []);
 
     const loginError = () =>
         toast.error("Please login to continue with AI", {
@@ -351,6 +310,39 @@ const Compiler = () => {
             theme: "colored",
         });
 
+    const min_height = 10;
+
+    const handleMouseMove = (e) => {
+        if (!isDragging.current || !editorSection.current) 
+            return;
+        const rect = editorSection.current.getBoundingClientRect();
+        const newHeightPx = e.clientY - rect.top;
+        const newHeightPct = (newHeightPx / rect.height) * 100;
+        const clampedHeight = Math.max(min_height, Math.min(100 - min_height, newHeightPct));
+        setEditorHeight(clampedHeight);
+    };
+
+    const handleMouseUp = () => {
+        if (isDragging.current) {
+            isDragging.current = false;
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        }
+    };
+
+    const handleMouseDown = (e) => {
+        e.preventDefault();
+        isDragging.current = true;
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+    };
+
+    useEffect(() => {
+        return () => {
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, []);
 
     return (
         <div className="app-container">
@@ -385,9 +377,6 @@ const Compiler = () => {
                                 <a href="/compilein/">
                                     <button className="dropdown-item" >Home</button>
                                 </a>
-
-                                {/* <button className="dropdown-item" >Profile</button> */}
-                                {/* <button className="dropdown-item" >Account Settings</button> */}
                                 {localStorage.getItem("loginCheck") === "false" ? (
                                     <button
                                         className="dropdown-item login-link"
@@ -407,7 +396,6 @@ const Compiler = () => {
                                         Logout
                                     </button>
                                 )}
-
                             </div>
                         )}
                     </div>
@@ -488,14 +476,14 @@ const Compiler = () => {
                     <div className="container"></div>
                 </section>
 
-                {/* <section
-                    className="editor-section flex-grow flex flex-col bg-[#1e1e1e] transition-all duration-300 min-w-0"
-                    style={{ width: mainContentWidth }}
-                > */}
                 <section
                     className="editor-section flex-grow flex flex-col bg-[#1e1e1e] transition-all duration-300 min-w-0"
+                    ref={editorSection}
                 >
-                    <section className="main-content flex-grow flex flex-col h-full">
+                    <section
+                        className="main-content flex flex-col overflow-hidden"
+                        style={{ height: `${editorHeight}%` }}
+                    >
                         <div className="toolbar flex justify-between items-center bg-[#282c34] p-2 flex-shrink-0 border-b border-gray-700">
                             <div className="left-toolbar">
                                 <div className="file-explorer-path">
@@ -534,11 +522,16 @@ const Compiler = () => {
                         </div>
                     </section>
 
-                    <section>
-                        <div className="container2"></div>
-                    </section>
+                    <div
+                        className="h-1.5 bg-[000000] cursor-ns-resize hover: transition-colors duration-200 flex-shrink-0 z-10"
+                        onMouseDown={handleMouseDown}
+                        title="Drag to resize terminal"
+                    />
 
-                    <section className="main-content-terminal flex-shrink-0 h-60 flex flex-col ">
+                    <section
+                        className="main-content-terminal flex flex-col overflow-hidden"
+                        style={{ height: `${100 - editorHeight}%` }}
+                    >
                         <div className="toolbar-terminal h-10">
                             <div className="left-toolbar1-terminal">
                                 <div className="file-explorer-path-terminal">
@@ -546,7 +539,7 @@ const Compiler = () => {
                                     <span className="path-item-terminal">Terminal</span>
                                 </div>
                             </div>
-                            <div className="right-toolbar1-terminal">
+                            <div className="right-toolbar1-terminal h-10">
                                 <button title='Delete'><img className='delete' src={delet} alt="delete" onClick={handleClearOutput} /></button>&nbsp;&nbsp;
                                 <button title='Terminal Toggle'><MdOutlineKeyboardArrowUp className='delete cursor-pointer' /></button>
                             </div>
@@ -565,56 +558,6 @@ const Compiler = () => {
                     </section>
                 </section>
 
-                {/* <section className="main-content">
-                    <div className="toolbar">
-                        <div className="left-toolbar1">
-                            <div className="file-explorer-path">
-                                <img className='terminal' src={terminal} />&nbsp;
-                                <span className="path-item">Terminal</span>
-                            </div>
-                        </div>
-                        <div className="right-toolbar1">
-                            <button title='Delete'><img className='delete' src={delet} /></button>&nbsp;&nbsp;
-                        </div>
-                    </div>
-                    <div className="code-editor-area">
-                        <div className="code-editor">
-                            <textarea placeholder="&nbsp;Output Here..."></textarea>
-                        </div>
-                    </div>
-                </section> */}
-
-                {/* <section className="main-content-ai">
-                    <div className="toolbar-ai">
-                        <div className="left-toolbar-ai">
-                            <div className="file-explorer-path-ai">
-                                <SiRobotframework className='delete mt-0.5' />&nbsp;&nbsp;
-                                <span className="path-item-ai">AI-Mode</span>
-                            </div>
-                        </div>
-                        <div className="right-toolbar-ai">
-                        </div>
-                    </div>
-                    <div className="code-editor-area-ai">
-                        <div className="code-editor-ai">
-                            <div className="toolbar-ai-bar mt-165 ml-1.5 mr-1.5">
-                                <input type="text" className="input-ai" placeholder="Ask AI..." />
-                                <div className="right-toolbar-ai">
-                                    <button title='Delete'><IoMdSend title='Send' className='delete cursor-pointer' /></button>&nbsp;&nbsp;
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section> */}
-
-                {/* <section
-                    className="main-content-ai flex-shrink-0 flex flex-col bg-[#21252b] shadow-2xl z-50 transition-all duration-300 border-l border-gray-700 ml-2"
-                    style={{
-                        width: isAIModeOpen ? `${AI_PANEL_WIDTH}px` : '0px',
-                        visibility: isAIModeOpen ? 'visible' : 'hidden',
-                        minWidth: isAIModeOpen ? `${AI_PANEL_WIDTH}px` : '0px',
-                    }}
-                > */}
                 <section
                     className="main-content-ai flex-shrink-0 flex flex-col bg-[#21252b] shadow-2xl z-50 transition-all duration-300 border-l border-gray-700 ml-2"
                     style={{
@@ -702,7 +645,6 @@ const Compiler = () => {
                                     )}
                                 </div>
                             ))}
-
                             {loading && (
                                 <p className="text-gray-300 text-sm mt-3 italic ml-2">
                                     Thinking<span className="animate-pulse">...</span>
@@ -735,4 +677,5 @@ const Compiler = () => {
         </div>
     );
 };
+
 export default Compiler;

@@ -10,7 +10,6 @@ import {
 } from "react-icons/fa";
 import { BsApple } from "react-icons/bs";
 import { ToastContainer, toast } from "react-toastify";
-import bgimg from "./../../src/pics/newbg.png";
 import newlogo from './../../src/assets/newlogo.png';
 import cmpltlogo from './../../src/assets/cmplt-logo.png';
 import LiquidEther from './LiquidEther';
