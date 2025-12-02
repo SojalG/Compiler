@@ -493,7 +493,24 @@ button img:hover {
     white-space: nowrap;
 }
 
+.dropdown-item1 {
+    width: 100%;
+    text-align: left;
+    padding: 10px 15px;
+    background: none;
+    border: none;
+    color: #abb2bf;
+    font-size: 14px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+}
+
 .dropdown-item:hover {
+    background-color: #3e4451;
+    color: #ffffff;
+}
+
+.dropdown-item1:hover {
     background-color: #3e4451;
     color: #ffffff;
 }

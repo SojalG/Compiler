@@ -1,681 +1,1045 @@
-import React, { useState, useEffect, useRef } from 'react';
-import Editor from '@monaco-editor/react';
-import './Compilerstyle.css';
-import profile from './pics/profile.png';
-import copy from './pics/copy.png';
-import terminal from './pics/terminal.png';
-import newlogo3 from './pics/newlogo3.png';
-import finale from './pics/finale.png';
-import refresh from './pics/refresh.png';
-import format from './pics/format.png';
-import light from './pics/light_mode.png';
-import dark from './pics/dark_mode.png';
-import delet from './pics/delete.png';
-import { IoMdSend } from 'react-icons/io';
-import { MdOutlineKeyboardArrowUp, MdEdit, MdDeleteOutline } from "react-icons/md";
-import { SiRobotframework } from "react-icons/si";
-import { IoCloseOutline } from "react-icons/io5";
+import React, { useState, useEffect, useRef } from "react";
+import Editor from "@monaco-editor/react";
+import "./Compilerstyle.css";
+import profile from "./pics/profile.png";
+import copy from "./pics/copy.png";
+import terminal from "./pics/terminal.png";
+import newlogo3 from "./pics/newlogo3.png";
+import finale from "./pics/finale.png";
+import refresh from "./pics/refresh.png";
+import format from "./pics/format.png";
+import light from "./pics/light_mode.png";
+import dark from "./pics/dark_mode.png";
+import delet from "./pics/delete.png";
+import { IoLogoJavascript, IoMdSend } from "react-icons/io";
+import {
+  MdOutlineKeyboardArrowUp,
+  MdEdit,
+  MdDeleteOutline,
+} from "react-icons/md";
+import { SiC, SiCplusplus, SiRobotframework } from "react-icons/si";
+import { IoCloseOutline, IoFolderOpenSharp } from "react-icons/io5";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Prism } from "react-syntax-highlighter";
 import { duotoneSea } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { FaCopy } from "react-icons/fa";
+import { FaCopy, FaJava, FaPython } from "react-icons/fa";
 import { PiBracketsCurlyBold } from "react-icons/pi";
-import { useNavigate } from 'react-router-dom';
+import { AnimatePresence } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+import { v4 as uuidv4 } from "uuid";
+import { VscNewFile } from "react-icons/vsc";
+import { CiFileOn } from "react-icons/ci";
+import { CgProfile } from "react-icons/cg";
 
 const codeSnippets = {
-    'Javascript': `// Javascript
+  Javascript: `// Javascript
 console.log("Hello, World!");`,
-    'C++': `// C++
+  "C++": `// C++
 #include <iostream>
 int main() {
     std::cout << "Hello, World!" << std::endl;
     return 0;
 }`,
-    'C': `// C
+  C: `// C
 #include <stdio.h>
 int main() {
     printf("Hello, World!");
     return 0;
 }`,
-    'Java': `// Java
+  Java: `// Java
 public class Main {
     public static void main(String[] args) {
         System.out.println("Hello, World!");
     }
 }`,
-    'Python': `# Python
+  Python: `# Python
 print("Hello, World!")
-`
+`,
 };
 
 const judge0LangId = {
-    Javascript: 63,
-    "C++": 54,
-    C: 50,
-    Java: 62,
-    Python: 71
+  Javascript: 63,
+  "C++": 54,
+  C: 50,
+  Java: 62,
+  Python: 71,
 };
+
+const mapLanguageKa = {
+  js: "Javascript",
+  cpp: "C++",
+  c: "c",
+  java: "Java",
+  py: "Python",
+};
+
+// const DUMMY_FILES = ['file1.js', 'file2.cpp', 'file3.c', 'file4.js', 'file5.py'];
 
 const Compiler = () => {
-    const [selectedLanguage, setSelectedLanguage] = useState('Javascript');
-    const [code, setCode] = useState(codeSnippets['Javascript']);
-    const [output, setOutput] = useState('');
-    const [isRunning, setIsRunning] = useState(false);
-    const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [istheme, setIstheme] = useState(false);
-    const [isLogout, setIsLogout] = useState(false);
-    const [isAIModeOpen, setIsAIModeOpen] = useState(false);
-    const textareaRef = useRef(null);
-    const AI_PANEL_DYNAMIC_WIDTH = '23%';
+  const [selectedLanguage, setSelectedLanguage] = useState("Javascript");
+  const [code, setCode] = useState(codeSnippets["Javascript"]);
+  const [output, setOutput] = useState("");
+  const [isRunning, setIsRunning] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [istheme, setIstheme] = useState(false);
+  //   const [isLogout, setIsLogout] = useState(false);
+  const [isAIModeOpen, setIsAIModeOpen] = useState(false);
+  const textareaRef = useRef(null);
+  const [monacoLanguage, setMonacoLanguage] = useState("javascript");
+  const [userName, setUserName] = useState("");
+  const AI_PANEL_DYNAMIC_WIDTH = "23%";
 
-    const [editorHeight, setEditorHeight] = useState(70);
-    const editorSection = useRef(null);
-    const isDragging = useRef(false);
+  const [editorHeight, setEditorHeight] = useState(70);
+  const editorSection = useRef(null);
+  const isDragging = useRef(false);
 
-    const languageMap = {
-        JavaScript: 'javascript',
-        'C++': 'cpp',
-        C: 'c',
-        Java: 'java',
-        Python: 'python',
-    };
+  const judge0Language = {
+    js: "Javascript",
+    cpp: "C++",
+    c: "C",
+    java: "Java",
+    py: "Python",
+  };
 
-    const [DUMMY_FILES, setDUMMY_FILES] = useState([
-        "file1.js",
-        "file2.cpp",
-        "file3.c",
-        "file4.js",
-        "file5.py",
-    ]);
+  const MonacoLanguage = {
+    js: "javascript",
+    cpp: "cpp",
+    c: "c",
+    java: "java",
+    py: "python",
+  };
 
-    const handleLanguageChange = (event) => {
-        const newLanguage = event.target.value;
-        setSelectedLanguage(newLanguage);
-        setCode(codeSnippets[newLanguage]);
-    };
+  const [DUMMY_FILES, setDUMMY_FILES] = useState([
+    {
+      id: uuidv4(),
+      name: "file1.js",
+      language: "javascript",
+      code: `// Javascript
+console.log("Hello, World!");`,
+    },
+    {
+      id: uuidv4(),
+      name: "file2.cpp",
+      language: "cpp",
+      code: `// C++
+      #include <iostream>
+      int main() {
+        std::cout << "Hello, World!" << std::endl;
+        return 0;
+        }`,
+    },
+    {
+      id: uuidv4(),
+      name: "file3.c",
+      language: "c",
+      code: `// C
+        #include <stdio.h>
+        int main() {
+          printf("Hello, World!");
+          return 0;
+          }`,
+    },
+    {
+      id: uuidv4(),
+      name: "file4.js",
+      language: "javascript",
+      code: `// Javascript
+          console.log("Hello, World!");`,
+    },
+    {
+      id: uuidv4(),
+      name: "file5.py",
+      language: "python",
+      code: `# Python
+          print("Hello, World!")
+          `,
+    },
+  ]);
 
-    const handleEditorChange = (value) => {
-        setCode(value);
+  const [activeFile, setActiveFile] = useState(DUMMY_FILES[0].id);
+  const handleLanguageChange = (event) => {
+    const newLanguage = event.target.value;
+    setSelectedLanguage(newLanguage);
+    setMonacoLanguage(MonacoLanguage[newLanguage]);
+    setCode(codeSnippets[newLanguage]);
+  };
+
+  // useEffect(() => {
+  //   console.log("Language for judge0 : " + selectedLanguage);
+  //   console.log("Language for monaco : " + monacoLanguage);
+  // }, [selectedLanguage, monacoLanguage]);
+
+  const handleFileChangeFirLanguageChange = (FILE_KA_NAAM) => {
+    // console.log(FILE_KA_NAAM);
+    const bhasha = FILE_KA_NAAM.split(".")[1];
+    setSelectedLanguage(judge0Language[bhasha]);
+    setMonacoLanguage(MonacoLanguage[bhasha]);
+    console.log("Language from file name : " + bhasha);
+    // setCode(codeSnippets[mapLanguageKa[bhasha]] || "");
+  };
+
+  const handleEditorChange = (value) => {
+    setCode(value);
+
+    setDUMMY_FILES((prev) =>
+      prev.map((file) =>
+        file.id === activeFile ? { ...file, code: value } : file
+      )
+    );
+  };
+
+  const toggleProfileMenu = () => {
+    setIsProfileMenuOpen((prev) => !prev);
+  };
+
+  const handleEditorDidMount = (editor, monaco) => {
+    monaco.editor.defineTheme("my-custom-theme", {
+      base: "vs-dark",
+      inherit: true,
+      rules: [],
+      colors: {
+        "editor.background": "#21252b",
+        "editorGutter.background": "#21252b",
+      },
+    });
+    monaco.editor.setTheme("my-custom-theme");
+  };
+
+  const navigate = useNavigate();
+
+  const handleLoginToggle = () => {
+    localStorage.setItem("loginCheck", "false");
+    localStorage.setItem("userId", null);
+    setIsLoggedIn(false);
+    navigate("/loginpage");
+  };
+
+  const theme = () => {
+    setIstheme((prev) => !prev);
+  };
+
+  //   const logout = () => {
+  //     setIsLogout((prev) => !prev);
+  //   };
+
+  const toggleAIMode = () => {
+    setIsAIModeOpen((prev) => !prev);
+  };
+
+  const handleClearOutput = () => setOutput("");
+
+  const handleRun = async () => {
+    const currentTerminal = output || "";
+    handleClearOutput();
+
+    setIsRunning(true);
+    setOutput((prev) => (prev ? prev + "\n" : ""));
+
+    try {
+      const payload = {
+        source_code: code,
+        language_id: judge0LangId[selectedLanguage],
+        stdin: currentTerminal,
+      };
+
+      const res = await fetch(
+        "https://ce.judge0.com/submissions/?base64_encoded=false&wait=true",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!res.ok) {
+        const text = await res.text();
+        setOutput(
+          (prev) =>
+            prev +
+            `\nError: Judge0 responded with status ${res.status}\n${text}\n`
+        );
+        return;
+      }
+
+      const data = await res.json();
+
+      let resultText = "\n=== Execution Result ===\n";
+
+      if (data.compile_output) {
+        resultText += `Compile Error:\n${data.compile_output}\n`;
+      }
+
+      if (data.stderr) {
+        resultText += `Runtime Error:\n${data.stderr}\n`;
+      }
+
+      if (data.stdout) {
+        resultText += `Output:\n${data.stdout}\n`;
+      }
+
+      if (!data.compile_output && !data.stderr && !data.stdout) {
+        if (data.status && data.status.description) {
+          resultText += `Status: ${data.status.description}\n`;
+        } else {
+          resultText += "No output received.\n";
+        }
+      }
+
+      setOutput((prev) => prev + resultText + "\n");
+
+      setTimeout(() => {
+        if (textareaRef.current) {
+          textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
+        }
+      }, 50);
+    } catch (err) {
+      setOutput((prev) => prev + `\nNetwork/Error: ${err.message}\n`);
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  // const mainContentWidth = isAIModeOpen
+  //     ? `calc(100% - ${FILE_PANEL_WIDTH}px - ${AI_PANEL_WIDTH}px)`
+  //     : `calc(100% - ${FILE_PANEL_WIDTH}px)`;
+
+  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+
+  const [question, setQuestion] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [codeToCopy, setCodeToCopy] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const successNotify = (msg) =>
+    toast.success(msg, {
+      position: "top-right",
+      autoClose: 2000,
+      theme: "colored",
+    });
+
+  //   const formatCode = (resp) => {
+  //     const code = resp.replace(/^```[a-zA-Z]*\n?/, "").replace(/```$/, "");
+  //     return (
+  //       <Prism language={selectedLanguage} style={oneDark}>
+  //         {code}
+  //       </Prism>
+  //     );
+  //   };
+
+  const askAi = async () => {
+    console.log(question);
+    if (!question.trim()) {
+      return;
     }
 
-    const toggleProfileMenu = () => {
-        setIsProfileMenuOpen(prev => !prev);
-    };
+    const newUserMsg = { role: "user", text: question.toString() };
+    const msgs = [...messages, newUserMsg];
+    setMessages(msgs);
+    setQuestion("");
 
-    const handleEditorDidMount = (editor, monaco) => {
-        monaco.editor.defineTheme('my-custom-theme', {
-            base: 'vs-dark',
-            inherit: true,
-            rules: [],
-            colors: {
-                'editor.background': '#21252b',
-                'editorGutter.background': '#21252b'
-            }
-        });
-        monaco.editor.setTheme('my-custom-theme');
-    };
+    setLoading(true);
 
-    const navigate = useNavigate();
+    try {
+      const prevMsgs = msgs.map((msg) => ({
+        role: msg.role === "user" ? "user" : "model",
+        parts: [{ text: msg.text || "" }],
+      }));
 
-    const handleLoginToggle = () => {
-        localStorage.setItem("loginCheck", "false");
-        setIsLoggedIn(false);
-        navigate("/loginpage");
-    };
+      const currMsg =
+        question +
+        `No explanation and in ${selectedLanguage} and add comments to explain code at the end of the code only and dont add comment in between the code`;
 
-    const theme = () => {
-        setIstheme(prev => !prev);
-    };
+      const currHistory = [
+        ...prevMsgs,
+        {
+          role: "user",
+          parts: [{ text: `Current Code ${code}` }],
+        },
+        {
+          role: "user",
+          parts: [{ text: currMsg }],
+        },
+      ];
 
-    const toggleAIMode = () => {
-        setIsAIModeOpen(prev => !prev);
-    };
+      const res = await model.generateContent({
+        contents: currHistory,
+      });
+      let resp = await res.response.text();
 
-    const handleClearOutput = () => setOutput('');
+      if (resp.trim().startsWith("```")) {
+        resp = resp.trim();
 
-    const handleRun = async () => {
-        const currentTerminal = output || '';
-        handleClearOutput();
+        let code;
 
-        setIsRunning(true);
-        setOutput(prev => (prev ? prev + '\n' : ''));
-
-        try {
-            const payload = {
-                source_code: code,
-                language_id: judge0LangId[selectedLanguage],
-                stdin: currentTerminal
-            };
-
-            const res = await fetch("https://ce.judge0.com/submissions/?base64_encoded=false&wait=true", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
-
-            if (!res.ok) {
-                const text = await res.text();
-                setOutput(prev => prev + `\nError: Judge0 responded with status ${res.status}\n${text}\n`);
-                return;
-            }
-
-            const data = await res.json();
-
-            let resultText = '\n=== Execution Result ===\n';
-
-            if (data.compile_output) {
-                resultText += `Compile Error:\n${data.compile_output}\n`;
-            }
-
-            if (data.stderr) {
-                resultText += `Runtime Error:\n${data.stderr}\n`;
-            }
-
-            if (data.stdout) {
-                resultText += `Output:\n${data.stdout}\n`;
-            }
-
-            if (!data.compile_output && !data.stderr && !data.stdout) {
-                if (data.status && data.status.description) {
-                    resultText += `Status: ${data.status.description}\n`;
-                } else {
-                    resultText += 'No output received.\n';
-                }
-            }
-            setOutput(prev => prev + resultText + '\n');
-            setTimeout(() => {
-                if (textareaRef.current) {
-                    textareaRef.current.scrollTop = textareaRef.current.scrollHeight;
-                }
-            }, 50);
-        } catch (err) {
-            setOutput(prev => prev + `\nNetwork/Error: ${err.message}\n`);
-        } finally {
-            setIsRunning(false);
-        }
-    };
-
-    const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-
-    const [question, setQuestion] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [messages, setMessages] = useState([]);
-    const [codeToCopy, setCodeToCopy] = useState("");
-    const [copied, setCopied] = useState(false);
-
-    const askAi = async () => {
-        console.log(question);
-        if (!question.trim()) {
-            return;
+        if (resp.includes("```")) {
+          const parts = resp.split("```");
+          code = parts[1].replace(/^[a-zA-Z]+\n/, "").trim();
+        } else {
+          code = resp;
         }
 
-        const newUserMsg = { role: "user", text: question.toString() };
-        const msgs = [...messages, newUserMsg];
-        setMessages(msgs);
-        setQuestion("");
-        setLoading(true);
-
-        try {
-            const prevMsgs = msgs.map((msg) => ({
-                role: msg.role === "user" ? "user" : "model",
-                parts: [{ text: msg.text || "" }],
-            }));
-
-            const currMsg =
-                question +
-                `No explanation and in ${selectedLanguage} and add comments to explain code at the end of the code only and dont add comment in between the code`;
-
-            const currHistory = [
-                ...prevMsgs,
-                {
-                    role: "user",
-                    parts: [{ text: `Current Code ${code}` }],
-                },
-                {
-                    role: "user",
-                    parts: [{ text: currMsg }],
-                },
-            ];
-
-            const res = await model.generateContent({
-                contents: currHistory,
-            });
-            let resp = await res.response.text();
-
-            if (resp.trim().startsWith("```")) {
-                resp = resp.trim();
-
-                let code;
-
-                if (resp.includes("```")) {
-                    const parts = resp.split("```");
-                    code = parts[1].replace(/^[a-zA-Z]+\n/, "").trim();
-                } else {
-                    code = resp;
-                }
-
-                const newAiMsg = {
-                    role: "ai",
-                    element: (
-                        <Prism language={selectedLanguage} style={duotoneSea}>
-                            {code}
-                        </Prism>
-                    ),
-                };
-                setCodeToCopy(code);
-
-                setMessages((prev) => [...prev, newAiMsg]);
-            } else {
-                const newAiMsg = { role: "ai", text: code.toString() };
-                setMessages((prev) => [...prev, newAiMsg]);
-            }
-        } catch (e) {
-            const newAiMsg = { role: "ai", text: "⚠️ Error" };
-            setMessages((prev) => [...prev, newAiMsg]);
-            console.error(e);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const chatRef = useRef(null);
-
-    useEffect(() => {
-        if (chatRef.current) chatRef.current.scrollIntoView({ behavior: "smooth" });
-    }, [messages, loading]);
-
-    const editFile = (index) => {
-        const newName = prompt("Enter new file name : ");
-        if (newName || newName.trim()) {
-            const updatedFiles = [...DUMMY_FILES];
-            updatedFiles[index] = newName.trim();
-            setDUMMY_FILES(updatedFiles);
-        }
-    };
-
-    const deleteFile = (index) => {
-        if (window.confirm(`Delete ${DUMMY_FILES[index]}?`)) {
-            const files = DUMMY_FILES.filter((_, i) => i !== index);
-            setDUMMY_FILES(files);
-        }
-    };
-
-    const loginError = () =>
-        toast.error("Please login to continue with AI", {
-            position: "top-right",
-            autoClose: 2000,
-            theme: "colored",
-        });
-
-    const min_height = 10;
-
-    const handleMouseMove = (e) => {
-        if (!isDragging.current || !editorSection.current) 
-            return;
-        const rect = editorSection.current.getBoundingClientRect();
-        const newHeightPx = e.clientY - rect.top;
-        const newHeightPct = (newHeightPx / rect.height) * 100;
-        const clampedHeight = Math.max(min_height, Math.min(100 - min_height, newHeightPct));
-        setEditorHeight(clampedHeight);
-    };
-
-    const handleMouseUp = () => {
-        if (isDragging.current) {
-            isDragging.current = false;
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
-        }
-    };
-
-    const handleMouseDown = (e) => {
-        e.preventDefault();
-        isDragging.current = true;
-        document.addEventListener('mousemove', handleMouseMove);
-        document.addEventListener('mouseup', handleMouseUp);
-    };
-
-    useEffect(() => {
-        return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
+        const newAiMsg = {
+          role: "ai",
+          element: (
+            <Prism language={selectedLanguage} style={duotoneSea}>
+              {code}
+            </Prism>
+          ),
         };
-    }, []);
+        setCodeToCopy(code);
 
-    return (
-        <div className="app-container">
-            <header className="header1">
-                <div className="left-header">
-                    <span className="left">
-                        <img className='imglogo-style' src={newlogo3} />&nbsp;
-                        <a href="/compilein/" className='active:scale-95'>
-                            <img className='img-logo' src={finale} />
-                        </a>
-                    </span>
+        setMessages((prev) => [...prev, newAiMsg]);
+      } else {
+        const newAiMsg = { role: "ai", text: code.toString() };
+        setMessages((prev) => [...prev, newAiMsg]);
+      }
+    } catch (e) {
+      const newAiMsg = { role: "ai", text: "⚠️ Error" };
+      setMessages((prev) => [...prev, newAiMsg]);
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const chatRef = useRef(null);
+
+  useEffect(() => {
+    if (chatRef.current) chatRef.current.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
+
+  const editFile = (key) => {
+    const newName = prompt("Enter new file name : ");
+    if (newName && newName.trim()) {
+      // const updatedFiles = [...DUMMY_FILES, ];
+      // updatedFiles[index] = newName.trim();
+      setDUMMY_FILES((prev) =>
+        prev.map((f) => (f.id === key ? { ...f, name: newName.trim() } : f))
+      );
+    }
+  };
+  const deleteFile = (key) => {
+    const fileName = DUMMY_FILES.find((f) => f.id === key).name;
+    if (window.confirm(`Delete ${fileName}`)) {
+      // const files = DUMMY_FILES.filter((_, i) => i !== index);
+      setDUMMY_FILES((prev) => prev.filter((f) => f.id !== key));
+    }
+  };
+
+  const handleAddNewFile = () => {
+    const fileName = prompt("Enter file name ");
+    if (!fileName.trim()) return;
+    const lang = fileName.split(".")[1];
+    const newFile = {
+      id: uuidv4(),
+      name: fileName,
+      language: MonacoLanguage[lang],
+      code: "",
+    };
+    setDUMMY_FILES((prev) => [...prev, newFile]);
+    setActiveFile(newFile.id);
+    setMonacoLanguage(newFile.language);
+    setSelectedLanguage(judge0Language[lang]);
+    setCode(newFile.code);
+    successNotify(`New file : ${fileName} added`);
+  };
+
+  // useEffect(() => {
+  //     const loggedIn = localStorage.getItem("loginCheck");
+  //     if (!loggedIn) {
+  //         setIsLoggedIn(false);
+  //         navigate("/login");
+  //     } else {
+  //         setIsLoggedIn(true);
+  //     }
+  // }, []);
+
+  const loginError = () =>
+    toast.error("Please login to continue with AI", {
+      position: "top-right",
+      autoClose: 2000,
+      theme: "colored",
+    });
+
+  useEffect(() => {
+    const currFile = DUMMY_FILES.find((file) => file.id === activeFile);
+    if (!currFile) {
+      if (DUMMY_FILES.length > 0) {
+        setActiveFile(DUMMY_FILES[0].id);
+        setCode(DUMMY_FILES[0].code);
+      } else {
+        setCode("");
+      }
+      return;
+    }
+    const formattedCode = currFile.code.replace(/^\s+/gm, "");
+    setCode(formattedCode);
+  }, [activeFile, DUMMY_FILES]);
+
+  const getFileIcon = (fileName) => {
+    if (fileName.endsWith(".py"))
+      return (
+        <img
+          src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg"
+          width={22}
+        />
+      );
+    else if (fileName.endsWith(".java"))
+      return (
+        <img
+          src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg"
+          width={22}
+        />
+      );
+    else if (fileName.endsWith(".js"))
+      return <IoLogoJavascript className="text-[#F7DF1E]" />;
+    else if (fileName.endsWith(".cpp"))
+      return <SiCplusplus className="text-[rgb(142,80,143)]" />;
+    else if (fileName.endsWith(".c"))
+      return <SiC className=" text-[rgb(39,93,141)]" />;
+    else return <CiFileOn />;
+  };
+
+  const min_height = 5;
+
+  const handleMouseMove = (e) => {
+    if (!isDragging.current || !editorSection.current) return;
+    const rect = editorSection.current.getBoundingClientRect();
+    const newHeightPx = e.clientY - rect.top;
+    const newHeightPct = (newHeightPx / rect.height) * 100;
+    const clampedHeight = Math.max(
+      min_height,
+      Math.min(100 - min_height, newHeightPct)
+    );
+    setEditorHeight(clampedHeight);
+  };
+
+  const handleMouseUp = () => {
+    if (isDragging.current) {
+      isDragging.current = false;
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    }
+  };
+
+  const handleMouseDown = (e) => {
+    e.preventDefault();
+    isDragging.current = true;
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
+  };
+
+  useEffect(() => {
+    const id = localStorage.getItem("userId");
+    // console.log("Check for repeated print " + id);
+    fetch("http://localhost:5000/api/find/getUser/" + encodeURIComponent(id))
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
+        const name = data.email.split("@")[0];
+        setUserName(name);
+      })
+      .catch((e) => console.log(e));
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, []);
+
+  return (
+    <div className="app-container">
+      <header className="header1">
+        <div className="left-header">
+          <span className="left">
+            <img className="imglogo-style" src={newlogo3} />
+            &nbsp;
+            <a href="/compilein/" className="active:scale-95">
+              <img className="img-logo" src={finale} />
+            </a>
+          </span>
+        </div>
+        <div className="right-header">
+          {istheme ? (
+            <button className="button2" title="Theme" onClick={theme}>
+              <img className="setting" src={dark} />
+            </button>
+          ) : (
+            <button className="button2" title="Theme" onClick={theme}>
+              <img className="setting" src={light} />
+            </button>
+          )}
+          <button
+            title="AI Mode"
+            onClick={toggleAIMode}
+            className={`p-3 mb-4 transition-colors duration-200 ${
+              isAIModeOpen ? "text-blue-400" : "text-white-400 hover:text-white"
+            }`}
+          >
+            <SiRobotframework
+              title="AI Mode"
+              className="ai mt-5 cursor-pointer"
+            />
+          </button>
+          <div className="profile-menu-container">
+            <button
+              className="button2 mt-3"
+              onClick={toggleProfileMenu}
+              title="Profile"
+            >
+              <img className="img1" src={profile} />
+            </button>
+            {isProfileMenuOpen && (
+              <div className="profile-dropdown-menu">
+                <div className="">
+                  {/* <button className="dropdown-item1"> */}
+                    <CgProfile className="mr-2 ml-3 h-10" />
+                    {userName}
+                  {/* </button> */}
                 </div>
-                <div className="right-header">
-                    {istheme ? (
-                        <button className='button2' title='Theme' onClick={theme}><img className='setting' src={dark} /></button>
-                    ) : (
-                        <button className='button2' title='Theme' onClick={theme}><img className='setting' src={light} /></button>
-                    )}
-                    <button
-                        title='AI Mode'
-                        onClick={toggleAIMode}
-                        className={`p-3 mb-4 transition-colors duration-200 ${isAIModeOpen ? 'text-blue-400' : 'text-white-400 hover:text-white'}`}
-                    >
-                        <SiRobotframework title='AI Mode' className='ai mt-5 cursor-pointer' />
-                    </button>
-                    <div className="profile-menu-container">
-                        <button className='button2 mt-3' onClick={toggleProfileMenu} title="Profile">
-                            <img className='img1' src={profile} />
-                        </button>
-                        {isProfileMenuOpen && (
-                            <div className="profile-dropdown-menu">
-                                <a href="/compilein/">
-                                    <button className="dropdown-item" >Home</button>
-                                </a>
-                                {localStorage.getItem("loginCheck") === "false" ? (
-                                    <button
-                                        className="dropdown-item login-link"
-                                        type="button"
-                                        title="Simulate Login"
-                                        onClick={handleLoginToggle}
-                                    >
-                                        Login
-                                    </button>
-                                ) : (
-                                    <button
-                                        className="dropdown-item logout-link"
-                                        type="button"
-                                        title="Simulate Login"
-                                        onClick={handleLoginToggle}
-                                    >
-                                        Logout
-                                    </button>
-                                )}
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </header>
+                <a href="/compilein/">
+                  <button className="dropdown-item">Home</button>
+                </a>
 
-            <hr className="separator" />
+                {localStorage.getItem("loginCheck") === "false" ? (
+                  <button
+                    className="dropdown-item login-link"
+                    type="button"
+                    title="Simulate Login"
+                    onClick={handleLoginToggle}
+                  >
+                    Login
+                  </button>
+                ) : (
+                  <button
+                    className="dropdown-item logout-link"
+                    type="button"
+                    title="Simulate Login"
+                    onClick={handleLoginToggle}
+                  >
+                    Logout
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
+      </header>
 
-            <main className="flex h-[calc(100vh-64px)] overflow-hidden">
-                <section className="filesection-login"><br />
-                    <div className="filepane-heading1">
-                        <b>FILES</b>
-                    </div>
-                    <hr style={{ width: '105%', marginBottom: '10px' }} />
-                    <div style={{ width: "100%", padding: "0 5px" }}>
-                        {localStorage.getItem("loginCheck") === "true" ? (
-                            <div style={{ marginTop: "15px" }}>
-                                <div
-                                    style={{
-                                        color: "#ffffff",
-                                        marginBottom: "15px",
-                                        fontSize: "0.9em",
-                                        fontWeight: "bold",
-                                    }}
-                                >
-                                    YOUR PROJECTS
-                                </div>
-                                {DUMMY_FILES.map((file, index) => (
-                                    <div
-                                        key={index}
-                                        className="file-item justify-between flex"
-                                        onMouseEnter={(e) =>
-                                            (e.currentTarget.style.backgroundColor = "#303953")
-                                        }
-                                        onMouseLeave={(e) =>
-                                        (e.currentTarget.style.backgroundColor =
-                                            index === 0 ? "#303953ff" : "transparent")
-                                        }
-                                        onClick={(e) =>
-                                            (e.currentTarget.style.backgroundColor = "#334474ff")
-                                        }
-                                    >
-                                        {file}
-                                        <div className="flex gap-2 ">
-                                            <MdEdit
-                                                onClick={() => editFile(index)}
-                                                className="hover:bg-slate-500 p-1 text-2xl rounded-2xl"
-                                            />
-                                            <MdDeleteOutline
-                                                onClick={() => deleteFile(index)}
-                                                className="hover:bg-slate-500 p-1 text-2xl rounded-2xl"
-                                            />
-                                        </div>
-                                    </div>
-                                ))}
-                                <br />
-                            </div>
-                        ) : (
-                            <>
-                                <div className="leftheading flex flex flex-col items-center justify-center text-center">
-                                    <b>Login to view your Files</b>
-                                </div>
-                                <br />
-                                <button
-                                    className="button-2 flex items-center justify-center mx-auto"
-                                    type="button"
-                                    title="Simulate Login"
-                                    onClick={handleLoginToggle}
-                                >
-                                    Login
-                                </button>
-                            </>
-                        )}
-                    </div>
-                </section>
+      <hr className="separator" />
 
-                <section>
-                    <div className="container"></div>
-                </section>
-
-                <section
-                    className="editor-section flex-grow flex flex-col bg-[#1e1e1e] transition-all duration-300 min-w-0"
-                    ref={editorSection}
+      <main className="flex h-[calc(100vh-64px)] overflow-hidden">
+        <section className="filesection-login">
+          <br />
+          <div className="filepane-heading1">
+            <b>FILES</b>
+          </div>
+          <hr style={{ width: "105%", marginBottom: "10px" }} />
+          <div style={{ width: "100%", padding: "0 5px" }}>
+            {localStorage.getItem("loginCheck") === "true" ? (
+              <div style={{ marginTop: "15px" }}>
+                <div
+                  style={{
+                    color: "#ffffff",
+                    marginBottom: "15px",
+                    fontSize: "0.9em",
+                    fontWeight: "bold",
+                  }}
+                  className="flex justify-between "
                 >
-                    <section
-                        className="main-content flex flex-col overflow-hidden"
-                        style={{ height: `${editorHeight}%` }}
-                    >
-                        <div className="toolbar flex justify-between items-center bg-[#282c34] p-2 flex-shrink-0 border-b border-gray-700">
-                            <div className="left-toolbar">
-                                <div className="file-explorer-path">
-                                    <span className="path-item">Editor</span>
+                  <div className="flex">
+                    <IoFolderOpenSharp className="text-[18px] mr-1 ml-2" />
+                    {/* <span>Files</span> */}
+                  </div>
+                  <button
+                    className="cursor-pointer hover:scale-[1.1] "
+                    onClick={handleAddNewFile}
+                  >
+                    <VscNewFile className="text-[18px] mr-3 hover:bg-slate-500 text-2xl rounded" />
+                  </button>
+                </div>
+                {DUMMY_FILES.map((file, index) => (
+                  <div
+                    key={file.id}
+                    className={`file-item justify-between  flex ${
+                      activeFile === file.id
+                        ? "bg-[#303953]"
+                        : "bg-transparent hover:bg-[#303953]"
+                    }`}
+                    // onMouseEnter={(e) =>
+                    //   (e.currentTarget.style.backgroundColor = "#303953")
+                    // }
+                    // onMouseLeave={(e) =>
+                    //   (e.currentTarget.style.backgroundColor =
+                    //     index === 0 ? "#303953ff" : "transparent")
+                    // }
+                    onClick={() => {
+                      // (e.currentTarget.style.backgroundColor = "#334474ff")
+                      setActiveFile(file.id);
+                      handleFileChangeFirLanguageChange(file.name);
+                      // setSelectedLanguage(file.language);
+                      // console.log(selectedLanguage);
+                    }}
+                  >
+                    <div className="flex items-center ">
+                      <span className="mr-1 text-[18px]">
+                        {/* {file.language === "javascript" && (
+                          <IoLogoJavascript className="text-[#F7DF1E]" />
+                        )}
+                        {file.language === "cpp" && (
+                          <SiCplusplus className="text-[rgb(142,80,143)]" />
+                        )}
+                        {file.language === "c" && (
+                          <SiC className=" text-[rgb(39,93,141)]" />
+                        )}
+                        {file.language === "java" && (
+                          <FaJava className="text-[#D00000]" />
+                        )}
+                        {file.language === "python" && (
+                          <FaPython className="text-[#306998]" />
+                        )} */}
+                        {getFileIcon(file.name)}
+                      </span>
+                      {file.name}
+                    </div>
+                    <div className="flex gap-2 ">
+                      <MdEdit
+                        onClick={() => editFile(file.id)}
+                        className="hover:bg-slate-500 p-1 text-2xl rounded-2xl"
+                      />
+                      <MdDeleteOutline
+                        onClick={() => deleteFile(file.id)}
+                        className="hover:bg-slate-500 p-1 text-2xl rounded-2xl"
+                      />
+                    </div>
+                  </div>
+                ))}
+                <br />
+              </div>
+            ) : (
+              <>
+                <div className="leftheading flex flex-col items-center justify-center text-center">
+                  <b>Login to view your Files</b>
+                </div>
+                <br />
+                <button
+                  className="button-2 flex items-center justify-center mx-auto"
+                  type="button"
+                  title="Simulate Login"
+                  onClick={handleLoginToggle}
+                >
+                  Login
+                </button>
+              </>
+            )}
+          </div>
+        </section>
+
+        <section>
+          <div className="container"></div>
+        </section>
+
+        <section
+          className="editor-section flex-grow flex flex-col bg-[#1e1e1e] transition-all duration-300 min-w-0"
+          ref={editorSection}
+        >
+          <section
+            className="main-content flex-grow flex flex-col h-full"
+            style={{ height: `${editorHeight}%` }}
+          >
+            <div className="toolbar flex justify-between items-center bg-[#282c34] p-2 flex-shrink-0 border-b border-gray-700">
+              <div className="left-toolbar">
+                <div className="file-explorer-path">
+                  <span className="path-item">Editor</span>
+                </div>
+              </div>
+              <div className="right-toolbar">
+                <button title="Format Code">
+                  <img className="copy" src={format} />
+                </button>
+                &nbsp;&nbsp;&nbsp;
+                <button title="Copy">
+                  <img className="copy" src={copy} />
+                </button>
+                &nbsp;&nbsp;
+                <button title="Reset">
+                  <img className="copy" src={refresh} />
+                </button>
+                &nbsp;&nbsp;
+                <select
+                  id="output-style"
+                  onChange={handleLanguageChange}
+                  value={selectedLanguage}
+                >
+                  <option>Javascript</option>
+                  <option>C++</option>
+                  <option>C</option>
+                  <option>Java</option>
+                  <option>Python</option>
+                </select>
+                &nbsp;&nbsp;&nbsp;
+                <button
+                  className="button-6"
+                  type="button"
+                  title="Run"
+                  onClick={handleRun}
+                  disabled={isRunning}
+                >
+                  {isRunning ? "Running..." : "Run"}
+                </button>{" "}
+              </div>
+            </div>
+            <div className="code-editor-area flex-grow overflow-hidden">
+              <div className="code-editor h-full w-full">
+                {/* <Editor
+                  height="100%"
+                  width="100%"
+                  language={monacoLanguage}
+                  // defaultLanguage={selectedLanguage}
+                  theme="vs-dark"
+                  options={{ fontSize: 16 }}
+                  value={code}
+                  onChange={handleEditorChange}
+                  onMount={handleEditorDidMount}
+                /> */}
+                <Editor
+                  key={activeFile + selectedLanguage}
+                  height="100%"
+                  width="100%"
+                  language={monacoLanguage}
+                  defaultValue={code}
+                  theme="vs-dark"
+                  options={{ fontSize: 16 }}
+                  onChange={(value) => setCode(value)}
+                  onMount={handleEditorDidMount}
+                />
+              </div>
+            </div>
+          </section>
+
+          <div
+            className="h-1.5 bg-[000000] cursor-ns-resize hover: transition-colors duration-200 flex-shrink-0 z-10"
+            onMouseDown={handleMouseDown}
+            title="Drag to resize terminal"
+          />
+
+          <section
+            className="main-content-terminal flex flex-col overflow-hidden"
+            style={{ height: `${100 - editorHeight}%` }}
+          >
+            <div className="toolbar-terminal h-10">
+              <div className="left-toolbar1-terminal">
+                <div className="file-explorer-path-terminal">
+                  <img className="terminal" src={terminal} />
+                  &nbsp;
+                  <span className="path-item-terminal">Terminal</span>
+                </div>
+              </div>
+              <div className="right-toolbar1-terminal">
+                <button title="Delete">
+                  <img
+                    className="delete"
+                    src={delet}
+                    alt="delete"
+                    onClick={handleClearOutput}
+                  />
+                </button>
+                &nbsp;&nbsp;
+                <button title="Terminal Toggle">
+                  <MdOutlineKeyboardArrowUp className="delete cursor-pointer" />
+                </button>
+              </div>
+            </div>
+            <div className="code-editor-area-terminal  flex-grow overflow-hidden">
+              <div className="code-editor-terminal">
+                <textarea
+                  ref={textareaRef}
+                  className="textarea1"
+                  placeholder="Type input here or view output..."
+                  value={output}
+                  onChange={(e) => setOutput(e.target.value)}
+                />
+              </div>
+            </div>
+          </section>
+        </section>
+
+        {/* <section className="main-content">
+                    <div className="toolbar">
+                        <div className="left-toolbar1">
+                            <div className="file-explorer-path">
+                                <img className='terminal' src={terminal} />&nbsp;
+                                <span className="path-item">Terminal</span>
+                            </div>
+                        </div>
+                        <div className="right-toolbar1">
+                            <button title='Delete'><img className='delete' src={delet} /></button>&nbsp;&nbsp;
+                        </div>
+                    </div>
+                    <div className="code-editor-area">
+                        <div className="code-editor">
+                            <textarea placeholder="&nbsp;Output Here..."></textarea>
+                        </div>
+                    </div>
+                </section> */}
+
+        {/* <section className="main-content-ai">
+                    <div className="toolbar-ai">
+                        <div className="left-toolbar-ai">
+                            <div className="file-explorer-path-ai">
+                                <SiRobotframework className='delete mt-0.5' />&nbsp;&nbsp;
+                                <span className="path-item-ai">AI-Mode</span>
+                            </div>
+                        </div>
+                        <div className="right-toolbar-ai">
+                        </div>
+                    </div>
+                    <div className="code-editor-area-ai">
+                        <div className="code-editor-ai">
+                            <div className="toolbar-ai-bar mt-165 ml-1.5 mr-1.5">
+                                <input type="text" className="input-ai" placeholder="Ask AI..." />
+                                <div className="right-toolbar-ai">
+                                    <button title='Delete'><IoMdSend title='Send' className='delete cursor-pointer' /></button>&nbsp;&nbsp;
                                 </div>
                             </div>
-                            <div className="right-toolbar">
-                                <button title='Format Code'><img className='copy' src={format} /></button>&nbsp;&nbsp;&nbsp;
-                                <button title='Copy'><img className='copy' src={copy} /></button>&nbsp;&nbsp;
-                                <button title='Reset'><img className='copy' src={refresh} /></button>&nbsp;&nbsp;
-                                <select id="output-style" onChange={handleLanguageChange} value={selectedLanguage}>
-                                    <option>Javascript</option>
-                                    <option>C++</option>
-                                    <option>C</option>
-                                    <option>Java</option>
-                                    <option>Python</option>
-                                </select>&nbsp;&nbsp;&nbsp;
-                                <button className="button-6" type="button" title='Run' onClick={handleRun} disabled={isRunning}>
-                                    {isRunning ? 'Running...' : 'Run'}
-                                </button>                            </div>
                         </div>
-                        <div className="code-editor-area flex-grow overflow-hidden">
-                            <div className="code-editor h-full w-full">
-                                <Editor
-                                    height="100%"
-                                    width="100%"
-                                    language={languageMap[selectedLanguage]}
-                                    defaultLanguage='javascript'
-                                    theme="vs-dark"
-                                    options={{ fontSize: 16 }}
-                                    value={code}
-                                    onChange={handleEditorChange}
-                                    onMount={handleEditorDidMount}
-                                />
-                            </div>
-                        </div>
-                    </section>
+                    </div>
+                </section> */}
 
-                    <div
-                        className="h-1.5 bg-[000000] cursor-ns-resize hover: transition-colors duration-200 flex-shrink-0 z-10"
-                        onMouseDown={handleMouseDown}
-                        title="Drag to resize terminal"
-                    />
-
-                    <section
-                        className="main-content-terminal flex flex-col overflow-hidden"
-                        style={{ height: `${100 - editorHeight}%` }}
-                    >
-                        <div className="toolbar-terminal h-10">
-                            <div className="left-toolbar1-terminal">
-                                <div className="file-explorer-path-terminal">
-                                    <img className='terminal' src={terminal} />&nbsp;
-                                    <span className="path-item-terminal">Terminal</span>
-                                </div>
-                            </div>
-                            <div className="right-toolbar1-terminal h-10">
-                                <button title='Delete'><img className='delete' src={delet} alt="delete" onClick={handleClearOutput} /></button>&nbsp;&nbsp;
-                                <button title='Terminal Toggle'><MdOutlineKeyboardArrowUp className='delete cursor-pointer' /></button>
-                            </div>
-                        </div>
-                        <div className="code-editor-area-terminal ">
-                            <div className="code-editor-terminal">
-                                <textarea
-                                    ref={textareaRef}
-                                    className='textarea1'
-                                    placeholder="Type input here or view output..."
-                                    value={output}
-                                    onChange={(e) => setOutput(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    </section>
-                </section>
-
-                <section
+        {/* <section
                     className="main-content-ai flex-shrink-0 flex flex-col bg-[#21252b] shadow-2xl z-50 transition-all duration-300 border-l border-gray-700 ml-2"
                     style={{
-                        width: isAIModeOpen ? AI_PANEL_DYNAMIC_WIDTH : "0px",
-                        visibility: isAIModeOpen ? "visible" : "hidden",
-                        minWidth: isAIModeOpen ? AI_PANEL_DYNAMIC_WIDTH : "0px",
-                        maxWidth: isAIModeOpen ? "350px" : "0px",
+                        width: isAIModeOpen ? `${AI_PANEL_WIDTH}px` : '0px',
+                        visibility: isAIModeOpen ? 'visible' : 'hidden',
+                        minWidth: isAIModeOpen ? `${AI_PANEL_WIDTH}px` : '0px',
                     }}
-                    onClick={() => {
-                        if (localStorage.getItem("loginCheck") === "false") loginError();
-                    }}
-                >
-                    <div className="toolbar-ai">
-                        <div className="left-toolbar-ai flex items-center justify-between w-full">
-                            <div className="file-explorer-path-ai">
-                                <SiRobotframework className='delete mt-0.5 align-right' />
-                                &nbsp;&nbsp;
-                                <span className="path-item-ai text-lg font-bold">AI-Mode</span>
-                            </div>
-                            <button
-                                title='Close AI Mode'
-                                onClick={toggleAIMode}
-                                className="p-1 rounded hover:bg-gray-700 transition-colors cursor-pointer">
-                                <IoCloseOutline />
-                            </button>
-                        </div>
+                > */}
+        <section
+          className="main-content-ai flex-shrink-0 flex flex-col bg-[#21252b] shadow-2xl z-50 transition-all duration-300 border-l border-gray-700 ml-2"
+          style={{
+            width: isAIModeOpen ? AI_PANEL_DYNAMIC_WIDTH : "0px",
+            visibility: isAIModeOpen ? "visible" : "hidden",
+            minWidth: isAIModeOpen ? AI_PANEL_DYNAMIC_WIDTH : "0px",
+            maxWidth: isAIModeOpen ? "350px" : "0px",
+          }}
+          onClick={() => {
+            if (localStorage.getItem("loginCheck") === "false") loginError();
+          }}
+        >
+          <div className="toolbar-ai">
+            <div className="left-toolbar-ai flex items-center justify-between w-full">
+              <div className="file-explorer-path-ai">
+                <SiRobotframework className="delete mt-0.5 align-right" />
+                &nbsp;&nbsp;
+                <span className="path-item-ai text-lg font-bold">AI-Mode</span>
+              </div>
+              <button
+                title="Close AI Mode"
+                onClick={toggleAIMode}
+                className="p-1 rounded hover:bg-gray-700 transition-colors cursor-pointer"
+              >
+                <IoCloseOutline />
+              </button>
+            </div>
+          </div>
+          <div className="code-editor-area-aix`">
+            <div className="ai-output-area">
+              {messages.map((msg, i) => (
+                <div key={i} className="flex flex-col gap-3 mt-4 mr-2">
+                  {msg.role === "user" ? (
+                    <div className="self-end bg-blue-600 px-4 py-2 rounded-2xl max-w-[80%] shadow text-white">
+                      <p className="text-sm">
+                        <span className="font-bold text-[13px]">YOU:</span>{" "}
+                        {msg.text}
+                      </p>
                     </div>
-                    <div className="code-editor-area-aix`">
-                        <div className="ai-output-area">
-                            {messages.map((msg, i) => (
-                                <div key={i} className="flex flex-col gap-3 mt-4 mr-2">
-                                    {msg.role === "user" ? (
-                                        <div className="self-end bg-blue-600 px-4 py-2 rounded-2xl max-w-[80%] shadow text-white">
-                                            <p className="text-sm">
-                                                <span className="font-bold text-[13px]">YOU:</span>{" "}
-                                                {msg.text}
-                                            </p>
-                                        </div>
-                                    ) : (
-                                        <div className="self-start bg-slate-800 text-white px-4 py-2 rounded-2xl max-w-[80%]  shadow text-sm ml-2">
-                                            <span className="font-bold flex justify-between text-slate-200">
-                                                AI : &nbsp;{" "}
-                                                <div className="flex gap-3">
-                                                    <div className="relative group">
-                                                        <button
-                                                            title="Get In Editor"
-                                                            className="cursor-pointer text-[17px]"
-                                                            onClick={() => {
-                                                                setCode(codeToCopy);
-                                                            }}
-                                                        >
-                                                            <PiBracketsCurlyBold />
-                                                            <span
-                                                                className={`absolute -top-8 left-1/2 -translate-x-1/2 text-xs rounded-md px-2 py-1 bg-slate-800 text-white transition-opacity duration-200 pointer-events-none group-hover:opacity-100 opacity-0 w-[90px]`}
-                                                            >
-                                                                Get In Editor
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                    <div className="relative group">
-                                                        <button
-                                                            title="Copy"
-                                                            className="cursor-pointer text-[16px]"
-                                                            onClick={() => {
-                                                                navigator.clipboard.writeText(codeToCopy);
-                                                                setCopied(true);
-                                                                setTimeout(() => setCopied(false), 800);
-                                                            }}
-                                                        >
-                                                            <FaCopy className='h-3.5 w-3.5' />
-                                                            <span
-                                                                className={`absolute -top-8 left-1/2 -translate-x-1/2 text-xs rounded-md px-2 py-1 bg-slate-800 text-white transition-opacity duration-200 pointer-events-none ${copied
-                                                                    ? "opacity-100"
-                                                                    : "opacity-0 group-hover:opacity-100"
-                                                                    }`}
-                                                            >
-                                                                {copied ? "Copied!" : "Copy"}
-                                                            </span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </span>
-                                            {msg.element ? msg.element : <p>{msg.text}</p>}
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                            {loading && (
-                                <p className="text-gray-300 text-sm mt-3 italic ml-2">
-                                    Thinking<span className="animate-pulse">...</span>
-                                </p>
-                            )}
-                            <div ref={chatRef}> </div>
-                        </div>
-                        <div className="toolbar-ai-bar">
-                            <input
-                                type="text"
-                                className="input-ai flex-grow bg-transparent text-white focus:outline-none placeholder-gray-500 text-sm p-1"
-                                placeholder="Ask AI..."
-                                value={question}
-                                onChange={(e) => setQuestion(e.target.value)}
-                                onKeyDown={(e) => e.key === "Enter" && askAi()}
-                                disabled={localStorage.getItem("loginCheck") === "false"}
-                            />
+                  ) : (
+                    <div className="self-start bg-slate-800 text-white px-4 py-2 rounded-2xl max-w-[80%]  shadow text-sm ml-2">
+                      <span className="font-bold flex justify-between text-slate-200">
+                        AI : &nbsp;{" "}
+                        <div className="flex gap-3">
+                          <div className="relative group">
                             <button
-                                title="Send"
-                                className="ml-2 text-blue-400 hover:text-blue-300 transition-colors p-1"
-                                onClick={askAi}
+                              title="Get In Editor"
+                              className="cursor-pointer text-[17px]"
+                              onClick={() => {
+                                setCode(codeToCopy);
+                              }}
                             >
-                                <IoMdSend title="Send" className="delete cursor-pointer" />
+                              <PiBracketsCurlyBold />
+                              <span
+                                className={`absolute -top-8 left-1/2 -translate-x-1/2 text-xs rounded-md px-2 py-1 bg-slate-800 text-white transition-opacity duration-200 pointer-events-none group-hover:opacity-100 opacity-0 w-[90px]`}
+                              >
+                                Get In Editor
+                              </span>
                             </button>
+                          </div>
+                          <div className="relative group">
+                            <button
+                              title="Copy"
+                              className="cursor-pointer text-[16px]"
+                              onClick={() => {
+                                navigator.clipboard.writeText(codeToCopy);
+                                setCopied(true);
+                                setTimeout(() => setCopied(false), 800);
+                              }}
+                            >
+                              <FaCopy className="h-3.5 w-3.5" />
+                              <span
+                                className={`absolute -top-8 left-1/2 -translate-x-1/2 text-xs rounded-md px-2 py-1 bg-slate-800 text-white transition-opacity duration-200 pointer-events-none ${
+                                  copied
+                                    ? "opacity-100"
+                                    : "opacity-0 group-hover:opacity-100"
+                                }`}
+                              >
+                                {copied ? "Copied!" : "Copy"}
+                              </span>
+                            </button>
+                          </div>
                         </div>
+                      </span>
+                      {msg.element ? msg.element : <p>{msg.text}</p>}
                     </div>
-                </section>
-            </main>
-            <ToastContainer />
-        </div>
-    );
-};
+                  )}
+                </div>
+              ))}
 
+              {loading && (
+                <p className="text-gray-300 text-sm mt-3 italic ml-2">
+                  Thinking<span className="animate-pulse">...</span>
+                </p>
+              )}
+              <div ref={chatRef}> </div>
+            </div>
+            <div className="toolbar-ai-bar">
+              <input
+                type="text"
+                className="input-ai flex-grow bg-transparent text-white focus:outline-none placeholder-gray-500 text-sm p-1"
+                placeholder="Ask AI..."
+                value={question}
+                onChange={(e) => setQuestion(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && askAi()}
+                disabled={localStorage.getItem("loginCheck") === "false"}
+              />
+              <button
+                title="Send"
+                className="ml-2 text-blue-400 hover:text-blue-300 transition-colors p-1"
+                onClick={askAi}
+              >
+                <IoMdSend title="Send" className="delete cursor-pointer" />
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+      <ToastContainer />
+    </div>
+  );
+};
 export default Compiler;
