@@ -35,10 +35,26 @@ router.post("/login", async (req, res) => {
     if (!isMatch)
       return res.status(400).json({ message: "Incorrect password" });
 
-    res.json({ message: "Login successful" });
+    res.json({
+      message: "Login successful",
+      user: {
+        userId: user._id,
+        userEmail: user.email,
+      },
+    });
   } catch (err) {
     console.error("LOGIN ERROR:", err);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/getUser/:id", async (req, res) => {
+  try {
+    const id = req.params.id;
+    const user = await User.findById(id).select("-password");
+    res.json(user);
+  } catch (e) {
+    res.json(e);
   }
 });
 
